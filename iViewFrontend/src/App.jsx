@@ -21,7 +21,7 @@ function App() {
 
   useEffect(() => {
     checkAuthStatus();
-
+//
     let logoutTimer;
 
     // Kullanıcı hareketsizse oturumu kapat
