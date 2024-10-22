@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import InterviewCard from '../components/InterviewCard'; // InterviewCard bileşenini çağırıyoruz
-import { useInterviewStore } from '../stores/Dashboard'; // Veriyi store'dan çekiyoruz
+import { useInterviewStore } from '../stores/useInterviewStore'; // Veriyi store'dan çekiyoruz
 
 function InterviewList() {
   const { interviews, fetchPublishedInterviews, loading, error } = useInterviewStore(); // Store'dan veriyi ve fonksiyonu çekiyoruz

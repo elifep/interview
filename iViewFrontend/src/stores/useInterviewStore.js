@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios'; 
+import axios from 'axios';
 
 export const useInterviewStore = create((set) => ({
     interviews: [],
@@ -62,7 +62,7 @@ export const useInterviewStore = create((set) => ({
         }
     },
 
-   // Published durumu değiştirme işlevi
+    // Published durumu değiştirme işlevi
     togglePublished: async (id, currentPublishedStatus) => {
         try {
             const updatedStatus = !currentPublishedStatus;
@@ -96,6 +96,48 @@ export const useInterviewStore = create((set) => ({
             }));
         } catch (error) {
             console.error('Mülakat silinirken hata oluştu:', error);
+        }
+    },
+    // Yalnızca yayınlanmış mülakatları fetch etme
+    fetchPublishedInterviews: async () => {
+        set({ loading: true, error: null });
+
+        // Token'ı localStorage'den al
+        const token = localStorage.getItem('token');
+        if (!token) {
+            set({ error: 'Kullanıcı yetkilendirilmedi, lütfen giriş yapın.', loading: false });
+            return;
+        }
+
+        try {
+            const response = await axios.get('http://localhost:5000/api/interview/published', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // Gelen yanıtın geçerli olup olmadığını kontrol edin
+            if (response.status === 200 && Array.isArray(response.data)) {
+                set({ interviews: response.data, loading: false });
+            } else {
+                throw new Error('Geçersiz yanıt alındı');
+            }
+        } catch (error) {
+            console.error('Yayınlanmış mülakatlar alınırken hata oluştu:', error);
+
+            // Hata mesajını daha spesifik hale getirme
+            let errorMessage = 'Yayınlanmış mülakatlar alınırken hata oluştu';
+            if (error.response) {
+                if (error.response.status === 401) {
+                    errorMessage = 'Yetkisiz erişim: Lütfen giriş yapın.';
+                } else if (error.response.status === 403) {
+                    errorMessage = 'Erişim engellendi: Bu işlem için izniniz yok.';
+                } else {
+                    errorMessage = `Hata: ${error.response.status} - ${error.response.data.message || 'Bilinmeyen hata'}`;
+                }
+            }
+
+            set({ error: errorMessage, loading: false });
         }
     },
 }));

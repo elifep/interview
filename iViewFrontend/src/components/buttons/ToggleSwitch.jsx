@@ -3,7 +3,7 @@ function ToggleSwitch({ isPublished, onToggle }) {
         <label className="relative inline-flex items-center cursor-pointer">
             <input
                 type="checkbox"
-                checked={isPublished}
+                checked={!!isPublished} // isPublished undefined olursa false'a dönüşür
                 onChange={onToggle}
                 className="sr-only"
             />
