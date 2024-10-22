@@ -4,7 +4,7 @@ import './index.css';  // Tailwind CSS stil dosyasını ekleyin
 
 
 createRoot(document.getElementById('root')).render(
-  <>
+  // <>
     <App />
-  </>,
+  // </>,
 )

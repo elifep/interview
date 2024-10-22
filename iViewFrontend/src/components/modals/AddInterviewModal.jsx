@@ -1,40 +1,29 @@
-import PropTypes from 'prop-types'; // PropTypes'i import ettik
+import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
+import { useQuestionStore } from '../../stores/useQuestionStore'; // Kullanacağımız store
+import { useInterviewStore } from '../../stores/useInterviewStore'; // Kullanacağımız store
 
 function AddInterviewModal({ isOpen, onClose, onAdd }) {
+    const { questions, fetchQuestions } = useQuestionStore();
+    const { addInterview } = useInterviewStore();
     const [interviewTitle, setInterviewTitle] = useState('');
     const [selectedQuestions, setSelectedQuestions] = useState([]);
     const [expireDate, setExpireDate] = useState('');
     const [canSkip, setCanSkip] = useState(false);
     const [showAtOnce, setShowAtOnce] = useState(false);
-    const [packageFilter, setPackageFilter] = useState('All'); // Paket filtresi için
-    const [availableQuestions, setAvailableQuestions] = useState([]); // Veritabanındaki soruları tutacak state
+    const [packageFilter, setPackageFilter] = useState('All');
 
-    // Soruları veritabanından çekme işlemi sadece modal açıldığında çalışır
+    // Modal açıldığında soruları fetch eder
     useEffect(() => {
         if (isOpen) {
-            fetchQuestionsFromDB();
+            console.log("Fetching questions inside modal...");
+            fetchQuestions();
         }
-    }, [isOpen]);
-
-    const fetchQuestionsFromDB = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/api/question/list', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const data = await response.json();
-            setAvailableQuestions(data);
-        } catch (error) {
-            console.error('Sorular alınırken hata oluştu:', error);
-        }
-    };
-
-    const handleAddInterview = async () => {
-        const expireDateObj = new Date(expireDate); 
+    }, [isOpen, fetchQuestions]);
+    
+    const handleAddInterview = () => {
+        // Tarih kontrolü
+        const expireDateObj = new Date(expireDate);
         const today = new Date();
     
         if (expireDateObj <= today) {
@@ -42,11 +31,13 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
             return;
         }
     
+        // Kullanıcı tercihi kontrolü
         if (!canSkip && !showAtOnce) {
             alert('Either "Can Skip" or "Show At Once" must be selected.');
             return;
         }
     
+        // Yeni mülakat verilerini oluşturma
         const newInterview = {
             title: interviewTitle,
             questions: selectedQuestions,
@@ -55,28 +46,22 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
             showAtOnce,
         };
     
-        try {
-            const response = await fetch('http://localhost:5000/api/interview/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-                body: JSON.stringify(newInterview),
-            });
+        // Yeni mülakatı ekleme
+        console.log("Adding new interview:", newInterview); // Eklenen veriyi kontrol amaçlı loglayın
     
-            if (response.ok) {
-                const data = await response.json();
-                onAdd(data.interview);
-                onClose();
-            } else {
-                const errorData = await response.json();
-                alert('Error creating interview: ' + errorData.message);
-            }
-        } catch {
-            alert('An error occurred while creating the interview.');
+        // Çift tetiklenmeyi önlemek için gerekli kontroller
+        try {
+            addInterview(newInterview);
+            onAdd(newInterview); // Ana bileşene ekleme işlemi bildiriliyor
+        } catch (error) {
+            console.error("Failed to add interview:", error);
+            alert("An error occurred while adding the interview. Please try again.");
+            return;
         }
-    };
+    
+        // Modalı kapatma
+        onClose();
+    };    
 
     if (!isOpen) return null;
 
@@ -113,8 +98,8 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
                         }
                         className="border border-gray-300 p-2 rounded-md w-full"
                     >
-                        {availableQuestions.length > 0
-                            ? availableQuestions
+                        {questions.length > 0
+                            ? questions
                                 .filter(q => packageFilter === 'All' || q.topic === packageFilter)
                                 .map((question) => (
                                     <option key={question._id} value={question._id}>
@@ -171,7 +156,6 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
     );
 }
 
-// PropTypes tanımlaması
 AddInterviewModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,

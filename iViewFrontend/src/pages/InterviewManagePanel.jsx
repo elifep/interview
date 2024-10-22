@@ -12,6 +12,7 @@ function InterviewManagePanel() {
     const [selectedInterview, setSelectedInterview] = useState(null);
 
     useEffect(() => {
+        console.log("veriler geliy")
         fetchInterviews(); 
         fetchQuestions();
     }, [fetchInterviews, fetchQuestions]);
