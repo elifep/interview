@@ -7,8 +7,11 @@ export const useInterviewStore = create((set) => ({
   isLoading: false,
   error: null,
   personalInfoSubmitted: false, // Bilgilerin gönderilip gönderilmediği durumu
+  
   currentQuestionIndex: 0, // Varsayılan başlangıç sorusu
-  timeRemaining: 120, // Varsayılan süre (saniye)
+ 
+
+  setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
   
   skipQuestion: () => set((state) => ({
     currentQuestionIndex: state.currentQuestionIndex + 1, // Sonraki soruya geç
@@ -17,7 +20,7 @@ export const useInterviewStore = create((set) => ({
   completeQuestion: () => {
     // Tamamlanan soru işlevi
   },
-
+ timeRemaining: 120, // Varsayılan süre (saniye)
   setInterview: (interview) => set((state) => ({
     ...state,
     interview: interview, // Yeni mülakatı set et
