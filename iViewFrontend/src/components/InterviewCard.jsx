@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function InterviewCard({ interview }) {
     const navigate = useNavigate();
 
-    const handleSeeVideos = (interviewId) => {
-        navigate(`/video-collection/${interviewId}`); // Videoları görme
-    };
+    // const handleSeeVideos = (interviewId) => {
+    //     navigate(`/videos/${interviewId}`); // Videoları görme
+    // };
 
     // Mülakatın linkini kopyalama işlevi
     const handleCopyLink = () => {
@@ -40,12 +41,18 @@ function InterviewCard({ interview }) {
                 <p className={`text-sm font-medium ${interview.published ? 'text-green-500' : 'text-red-500'}`}>
                     {interview.published ? 'Published' : 'Not Published'}
                 </p>
-                <button
+                {/* <button
                     className="text-sm font-medium text-blue-500 hover:text-blue-700 transition-all duration-150"
                     onClick={() => handleSeeVideos(interview._id)} // Burada _id kullanıyoruz
                 >
                     See Videos &gt;
-                </button>
+                </button> */}
+                 <Link 
+        to={`/videos/${interview._id}`} 
+        className="text-sm font-medium text-blue-500 hover:text-blue-700 transition-all duration-150"
+      >
+        See Videos &gt;
+      </Link>
             </div>
         </div>
     );
