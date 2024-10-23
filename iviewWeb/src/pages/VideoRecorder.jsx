@@ -39,33 +39,40 @@ const VideoRecorder = () => {
 
   const handleDataAvailable = ({ data }) => {
     if (data.size > 0) {
-      setRecordedChunks((prev) => [...prev, data]);
+      setRecordedChunks((prev) => [...prev, data]); // Ensure `recordedChunks` is an array
     }
   };
 
   const handleStopCaptureClick = () => {
     mediaRecorderRef.current.stop();
     setIsRecording(false);
+    // Kaydı tamamla ve ardından videoyu yükle
     uploadVideo();
   };
-
+  
   const uploadVideo = async () => {
     if (recordedChunks.length > 0) {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const blob = new Blob(recordedChunks, { type: 'video/webm' }); // Yüklemek için video dosyasını blob olarak oluştur
       const formData = new FormData();
-      formData.append('file', blob, 'recordedVideo.webm');
-
+      
+      formData.append('video', blob, 'recordedVideo.mp4'); // Blob'u form data'ya ekle
+      formData.append('candidateId', '12345'); // Örnek olarak bir candidateId ekliyoruz (dinamik yapabilirsiniz)
+      formData.append('interviewId', 'interview_01'); // Örnek olarak bir interviewId ekliyoruz (dinamik yapabilirsiniz)
+  
       try {
-        const response = await axios.post('/api/upload', formData, {
+        const response = await axios.post('/api/video/upload', formData, {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         });
-        console.log('Video uploaded successfully:', response.data);
-        resetChunks();
+        console.log('Video başarıyla yüklendi:', response.data.videoUrl);
+        // Burada video URL'sini state'e veya bir yere kaydedebilirsiniz, böylece videoyu izleyebilirsiniz.
+        resetChunks(); // Video yüklemesi tamamlandığında chunk'ları sıfırla
       } catch (error) {
-        console.error('Video upload failed:', error);
+        console.error('Video yüklenemedi:', error);
       }
+    } else {
+      console.warn('Yüklenecek video yok');
     }
   };
 

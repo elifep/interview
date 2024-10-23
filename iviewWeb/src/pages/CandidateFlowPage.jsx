@@ -1,21 +1,19 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useInterviewStore } from '../stores/useInterviewStore'; // Doğru store'dan import edildiğinden emin olun
+import { useInterviewStore } from '../stores/useInterviewStore';
 import PersonalInfoFormPage from './PersonalInfoFormPage';
-import InterviewFlowPage from './InterviewFlowPage'; // InterviewFlowPage bileşenini doğru şekilde import edin
-
+import InterviewFlowPage from './InterviewFlowPage';
 
 const CandidateFlowPage = () => {
-    const { uniqueId } = useParams(); // URL'den uniqueId'yi alıyoruz
-    const { fetchInterview, interview, isLoading, error, personalInfoSubmitted } = useInterviewStore(); // fetchInterview burada mevcut olmalı
+    const { uniqueId } = useParams();
+    const { fetchInterview, interview, isLoading, error, personalInfoSubmitted } = useInterviewStore();
 
     useEffect(() => {
-        console.log('uniqueId:', uniqueId);
-        console.log('fetchInterview fonksiyonu:', fetchInterview); // fetchInterview'in mevcut olup olmadığını kontrol edin
         if (uniqueId) {
             fetchInterview(uniqueId);
         }
     }, [uniqueId, fetchInterview]);
+
     if (isLoading) {
         return <p>Mülakat bilgileri yükleniyor...</p>;
     }
