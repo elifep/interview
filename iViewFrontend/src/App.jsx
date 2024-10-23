@@ -60,7 +60,7 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/manage-packages" element={<QuestionsManagePanel />} />
                 <Route path="/interview-list" element={<InterviewManagePanel />} />
-                <Route path="/video-collection/:id" element={<VideoCollection />} />
+                <Route path="/videos/:interviewId" element={<VideoCollection />} />
                 <Route path="/interview/:id" element={<InterviewDetail />} /> 
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
