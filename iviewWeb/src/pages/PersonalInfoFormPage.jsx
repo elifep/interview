@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useInterviewStore } from '../stores/useInterviewStore'; // Store for managing interview flow
 
 const PersonalInfoFormPage = () => {
@@ -9,6 +9,7 @@ const PersonalInfoFormPage = () => {
         phone: '',
         consent: false, // For checkbox consent
     });
+    const [validationError, setValidationError] = useState(''); // Hata mesajı için state
 
     const { submitPersonalInfo, error } = useInterviewStore();
 
@@ -20,15 +21,34 @@ const PersonalInfoFormPage = () => {
         });
     };
 
+    const validateForm = () => {
+        // E-posta ve telefon için basit doğrulama
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^\+?[0-9\s-]+$/;
+
+        if (!emailRegex.test(formData.email)) {
+            return 'Please enter a valid email address.';
+        }
+        if (!phoneRegex.test(formData.phone)) {
+            return 'Please enter a valid phone number.';
+        }
+        if (!formData.consent) {
+            return 'Please agree to the KVKK text.';
+        }
+        return ''; // Hata yoksa boş string döndür
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (formData.consent) {
-            submitPersonalInfo(formData); // Only submit if consent is true
-        } else {
-            alert('Please agree to the KVKK text.');
+        const validationError = validateForm();
+        if (validationError) {
+            setValidationError(validationError); // Hata mesajını state'e kaydet
+            return;
         }
+        setValidationError(''); // Hata yoksa mesajı sıfırla
+        submitPersonalInfo(formData);
     };
-  
+
     return (
         <div className="w-full h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-md">
@@ -36,6 +56,7 @@ const PersonalInfoFormPage = () => {
 
                 {/* Display error if there is any */}
                 {error && <p className="text-red-600 mb-4">{error}</p>}
+                {validationError && <p className="text-red-600 mb-4">{validationError}</p>}
 
                 <form onSubmit={handleSubmit}>
                     <label className="block mb-2">Name*</label>
@@ -89,7 +110,7 @@ const PersonalInfoFormPage = () => {
                                 required
                             />
                             I have read and approved the{' '}
-                            <a href="#" className="text-indigo-700 underline">
+                            <a href="/kvkk" className="text-indigo-700 underline">
                                 KVKK text
                             </a>
                         </label>

@@ -3,98 +3,69 @@ import { create } from 'zustand';
 
 export const useInterviewStore = create((set) => ({
   interview: null,
-  questions: [],
+  questions: [], // Sorular burada tutulacak
   isLoading: false,
   error: null,
-  personalInfoSubmitted: false, // Bilgilerin gönderilip gönderilmediği durumu
-  currentQuestionIndex: 0, // Varsayılan başlangıç sorusu
+  personalInfoSubmitted: false,
+  currentQuestionIndex: 0,
   timeRemaining: 120, // Varsayılan süre (saniye)
-  
-  skipQuestion: () => set((state) => ({
-    currentQuestionIndex: state.currentQuestionIndex + 1, // Sonraki soruya geç
-  })),
-  
-  completeQuestion: () => {
-    // Tamamlanan soru işlevi
+
+  // Kişisel bilgileri gönderme işlevi (Backend'e POST isteği gönderilebilir)
+  submitPersonalInfo: async (formData) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await axios.post('http://localhost:5000/api/application/personal-info', formData);
+      
+      if (response.status === 200) {
+        set({ personalInfoSubmitted: true, isLoading: false });
+      } else {
+        throw new Error('Bilgiler gönderilirken hata oluştu.');
+      }
+    } catch (error) {
+      console.error('Kişisel bilgiler gönderilirken hata oluştu:', error);
+      set({ error: 'Kişisel bilgiler gönderilemedi', isLoading: false });
+    }
   },
 
-  setInterview: (interview) => set((state) => ({
-    ...state,
-    interview: interview, // Yeni mülakatı set et
-  })),
-  // Mülakat bilgilerini backend'den çekme fonksiyonu
+  // Mülakat bilgilerini uniqueId'ye göre backend'den çekme işlevi
   fetchInterview: async (uniqueId) => {
     set({ isLoading: true, error: null });
     try {
-        const response = await axios.get(`http://localhost:5000/api/application/apply/${uniqueId}`);
-        const interview = response.data;
+      const response = await axios.get(`http://localhost:5000/api/application/apply/${uniqueId}`);
+      const interview = response.data;
 
-        // Eğer interview.questions boş geliyorsa bu aşamada kontrol edebilirsiniz
-        if (!interview.questions || interview.questions.length === 0) {
-            throw new Error('No questions found in this interview');
-        }
+      if (!interview.questions || interview.questions.length === 0) {
+        throw new Error('Bu mülakata ait soru bulunamadı.');
+      }
 
-        set({ interview, isLoading: false });
+      set({
+        interview,
+        questions: interview.questions, // Soruları state'e kaydediyoruz
+        currentQuestionIndex: 0, // İlk soruya set et
+        timeRemaining: interview.questions[0]?.timeLimit || 120, // İlk sorunun zaman limitini ayarlıyoruz
+        isLoading: false,
+      });
     } catch (error) {
-        console.error('Error loading interview:', error);
-        set({ error: 'Failed to load interview details', isLoading: false });
+      console.error('Mülakat bilgileri yüklenirken hata oluştu:', error);
+      set({ error: 'Mülakat bilgileri yüklenemedi', isLoading: false });
     }
-},
+  },
 
-
+  // Sonraki soruya geçme işlevi
   skipQuestion: () => set((state) => {
     const nextIndex = state.currentQuestionIndex + 1;
     if (nextIndex < state.questions.length) {
       return {
         currentQuestionIndex: nextIndex,
-        timeRemaining: state.questions[nextIndex].timeLimit,
+        timeRemaining: state.questions[nextIndex].timeLimit || 120, // Sonraki sorunun süresini ayarlıyoruz
       };
     }
-    return state;
+    return state; // Eğer son soruya ulaşıldıysa, state aynı kalır
   }),
 
-  // Kişisel bilgileri gönderme fonksiyonu
-  submitPersonalInfo: async (formData) => {
-    // try {
-    //   set({ isLoading: true });
-      
-    //   const token = localStorage.getItem('token'); // Token'ı alıyoruz, gerekiyorsa
-
-    //   // API'ye POST isteği ile form verilerini gönderiyoruz
-    //   await axios.post('http://localhost:5000/api/application/personal-info', formData, {
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`,
-    //     },
-    //   });
-
-    //   set({ personalInfoSubmitted: true, isLoading: false });
-    // } catch (error) {
-    //   console.error('Kişisel bilgiler gönderilirken hata oluştu:', error);
-    //   set({ error: 'Kişisel bilgiler gönderilirken hata oluştu', isLoading: false });
-    // }
-     // Geçici olarak, kişisel bilgi gönderildiğinde personalInfoSubmitted'i true yapıyoruz
-     set({ personalInfoSubmitted: true });
-  },
-
-  // Mülakat bilgilerini backend'den çekme fonksiyonu
-//   fetchInterview: async (uniqueId) => {
-//     set({ isLoading: true, error: null });
-//     try {
-//       const response = await axios.get(`http://localhost:5000/api/application/apply/${uniqueId}`);
-//       const interview = response.data;
-      
-//       // Tüm soruları /list API'sinden alıyoruz
-//       await set().fetchQuestions();
-
-//       set({ interview, isLoading: false });
-//     } catch (error) {
-//       console.error('Mülakat yüklenirken hata oluştu:', error);
-//       set({ error: 'Mülakat bilgileri yüklenemedi', isLoading: false });
-//     }
-//   },
-
+  // Sorular tamamlandığında yapılacak işlemler
   completeQuestion: () => {
-    // Sorular tamamlandığında yapılacak işlemler
+    // Burada tamamlanan soruya göre işlemler yapılabilir, backend'e veri gönderilebilir
+    console.log("Interview completed.");
   },
-
 }));

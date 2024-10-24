@@ -2,24 +2,23 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PersonalInfoFormPage from './pages/PersonalInfoFormPage';
 import InterviewFlowPage from './pages/InterviewFlowPage';
-import CandidateFlowPage from './pages/CandidateFlowPage'; // Assuming this is your interview page
+import CandidateFlowPage from './pages/CandidateFlowPage';
 
 function App() {
     return (
         <Router>
             <Routes>
-                {/* Home route can lead to personal info or landing page */}
+                {/* Kişisel Bilgi Formu Ana Sayfa */}
                 <Route path="/" element={<PersonalInfoFormPage />} />
-                    {/* Route for applying with a unique interview link */}
-                    <Route path="/api/application/apply/:uniqueId" element={<CandidateFlowPage />} />
+                
+                {/* Adayların başvuru linkinden başlattığı mülakat için dinamik rota */}
+                <Route path="/apply/:uniqueId" element={<CandidateFlowPage />} />
 
-                {/* Route for personal info form */}
+                {/* Kişisel bilgi formu sayfası */}
                 <Route path="/personal-info" element={<PersonalInfoFormPage />} />
 
-                {/* Route for the candidate interview flow after the personal info form */}
+                {/* Mülakat akışını yöneten sayfa */}
                 <Route path="/interview" element={<InterviewFlowPage />} />
-
-            
             </Routes>
         </Router>
     );
