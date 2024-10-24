@@ -31,7 +31,7 @@ const PersonalInfoFormPage = () => {
         }
         if (!phoneRegex.test(formData.phone)) {
             return 'Please enter a valid phone number.';
-        }
+        }//
         if (!formData.consent) {
             return 'Please agree to the KVKK text.';
         }
