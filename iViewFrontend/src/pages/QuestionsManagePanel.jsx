@@ -1,12 +1,12 @@
-import  { useState, useEffect } from 'react'; // useEffect kancasını ekliyoruz
+import { useState, useEffect } from 'react'; // useEffect kancasını ekliyoruz
 import QuestionsList from '../components/QuestionsList';
 import FilterDropdown from '../components/FilterDropdown';
 import AddButton from '../components/buttons/AddButton';
 import AddQuestionsModal from '../components/modals/AddQuestionsModal'; // Modal'ı import ediyoruz.
 import { useQuestionStore } from '../stores/useQuestionStore'; // Store'dan veri çekmek için import ediyoruz.
 
-function QuestionManagePanel() {
-    const { questions, addQuestion, deleteQuestion, loading, error } = useQuestionStore(); // Soruları fetch etmek için `fetchQuestions` ekledik
+function QuestionsManagePanel() {
+    const { questions, fetchQuestions, addQuestion, deleteQuestion, loading, error } = useQuestionStore(); // Soruları fetch etmek için `fetchQuestions` ekledik
     const [filteredQuestions, setFilteredQuestions] = useState([]);
     const [filter, setFilter] = useState('All');
     const [isAddModalOpen, setAddModalOpen] = useState(false); // Ekleme modal kontrolü
@@ -14,9 +14,9 @@ function QuestionManagePanel() {
     const [selectedQuestion, setSelectedQuestion] = useState(null); // Düzenlenecek soruyu kaydetmek için state
 
     // Sayfa yüklendiğinde soruları backend'den çek
-    // useEffect(() => {
-    //     fetchQuestions(); // Soruları backend'den çekiyoruz
-    // }, [fetchQuestions]);
+    useEffect(() => {
+        fetchQuestions(); // Soruları backend'den çekiyoruz
+    }, [fetchQuestions]);
 
     // Sorular değiştikçe filtrelenmiş soruları günceller
     useEffect(() => {
@@ -43,7 +43,7 @@ function QuestionManagePanel() {
         setAddModalOpen(false); // Modal kapatılıyor
     };
 
-    // Soru silme işlem
+    // Soru silme işlemi
     const handleDelete = (id) => {
         console.log(`Deleting question with ID: ${id}`);
         deleteQuestion(id); // Soru store'dan siliniyor
@@ -53,7 +53,8 @@ function QuestionManagePanel() {
     const handleEdit = (question) => {
         setSelectedQuestion(question); // Düzenlenecek soruyu seçiyoruz
         setEditModalOpen(true); // Edit modali açılıyor
-    };  
+    };
+
     return (
         <div>
             <h2 className="text-2xl font-semibold text-indigo-700 mb-6">Questions Manage Panel</h2>
@@ -81,7 +82,6 @@ function QuestionManagePanel() {
             />
 
             {/* Düzenleme Modalı */}
-            {/* selectedQuestion burada düzenlenecek olan soru */}
             {selectedQuestion && (
                 <AddQuestionsModal
                     isOpen={isEditModalOpen}
@@ -94,4 +94,4 @@ function QuestionManagePanel() {
     );
 }
 
-export default QuestionManagePanel;
+export default QuestionsManagePanel;

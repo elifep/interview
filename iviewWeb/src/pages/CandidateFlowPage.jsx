@@ -5,7 +5,11 @@ import PersonalInfoFormPage from './PersonalInfoFormPage';
 import InterviewFlowPage from './InterviewFlowPage';
 
 const CandidateFlowPage = () => {
+<<<<<<< HEAD
     const { uniqueId } = useParams(); // URL'den uniqueId'yi alıyoruz
+=======
+    const { uniqueId } = useParams();
+>>>>>>> 4a2f93eeaa170cc07469b40b7994db797303e4a9
     const { fetchInterview, interview, isLoading, error, personalInfoSubmitted } = useInterviewStore();
 
     useEffect(() => {

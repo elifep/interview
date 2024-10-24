@@ -1,6 +1,6 @@
 import { useEffect } from 'react'; 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';  
+import Dashboard from './pages/Dashboard';  
 import Login from './pages/Login'; 
 import { useAuthStore } from './stores/authStore'; 
 import Header from './components/Header'; 
@@ -14,7 +14,7 @@ import QuestionsManagePanel from './pages/QuestionsManagePanel';
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated); 
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus); 
-  const logout = useAuthStore((state) => state.logout); // Logout fonksiyonunu çekiyoruz
+  const logout = useAuthStore((state) => state.logout);
 
   // Oturum süresi kontrolü için
   const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 saat (milisaniye cinsinden)
@@ -37,6 +37,9 @@ function App() {
     window.addEventListener("mousemove", resetLogoutTimer);
     window.addEventListener("keypress", resetLogoutTimer);
 
+    // Başlangıçta logout timer'ı başlat
+    resetLogoutTimer();
+
     // Bileşen unmount olduğunda event listener'ları temizle
     return () => {
       window.removeEventListener("mousemove", resetLogoutTimer);
@@ -51,22 +54,13 @@ function App() {
         <div className="min-h-screen flex">
           <Sidebar />
           <div className="flex flex-col w-full">
-            <Header />
-            {/* Çıkış Butonu */}
-            <div className="flex justify-end p-4">
-              <button 
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                onClick={logout}
-              >
-                Logout
-              </button>
-            </div>
+            <Header onLogout={logout} />
             <main className="p-4">
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Dashboard />} />
                 <Route path="/manage-packages" element={<QuestionsManagePanel />} />
                 <Route path="/interview-list" element={<InterviewManagePanel />} />
-                <Route path="/video-collection/:id" element={<VideoCollection />} />
+                <Route path="/videos/:interviewId" element={<VideoCollection />} />
                 <Route path="/interview/:id" element={<InterviewDetail />} /> 
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

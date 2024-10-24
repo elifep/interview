@@ -6,6 +6,15 @@ export const useAuthStore = create((set) => ({
     user: null, // Kullanıcı bilgilerini saklama
     token: localStorage.getItem('token') || null, // localStorage'dan token yükleniyor
 
+    // Oturum durumunu kontrol etme fonksiyonu
+    checkAuthStatus: () => {
+        const token = localStorage.getItem('token'); // Token olup olmadığını kontrol edin
+        if (token) {
+            set({ isAuthenticated: true });
+        } else {
+            set({ isAuthenticated: false });
+        }
+    },
     // Giriş yapma işlevi
     login: async (username, password) => {
         try {
@@ -57,14 +66,14 @@ export const useAuthStore = create((set) => ({
         }
     },
 
-    // Token olup olmadığını kontrol etme
-    checkAuthStatus: () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            set({ isAuthenticated: true, token });
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        } else {
-            set({ isAuthenticated: false, token: null });
-        }
-    },
+    // // Token olup olmadığını kontrol etme
+    // checkAuthStatus: () => {
+    //     const token = localStorage.getItem('token');
+    //     if (token) {
+    //         set({ isAuthenticated: true, token });
+    //         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    //     } else {
+    //         set({ isAuthenticated: false, token: null });
+    //     }
+    // },
 }));
