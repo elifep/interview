@@ -114,7 +114,8 @@ decrementTime: () => {
   
       // Step 2: Fetch the full interview questions using the correct interview ID
       const questionsResponse = await axios.get(`http://localhost:5000/api/interview/start/${interviewId}`);
-      const questions = questionsResponse.data;
+      // Soruların yapısına göre ayıklama yapıyoruz
+      const questions = questionsResponse.data.questions || questionsResponse.data;
   
       console.log('Questions response:', questions);
   
@@ -130,7 +131,7 @@ decrementTime: () => {
           questions, // Merging questions into the interview object
         },
         currentQuestionIndex: 0,
-        timeRemaining: questions[0]?.timeLimit || 120,
+        timeRemaining: questions[0]?.timeLimit * 60 || 120, // Varsayılan süre
         isLoading: false,
       });
     } catch (error) {
@@ -138,6 +139,7 @@ decrementTime: () => {
       set({ error: 'Failed to load interview details', isLoading: false });
     }
   },
+  
 
 
   // Kişisel bilgileri gönderme fonksiyonu

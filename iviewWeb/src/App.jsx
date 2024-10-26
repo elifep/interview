@@ -11,7 +11,7 @@ function App() {
                 {/* Home route can lead to personal info or landing page */}
                 <Route path="/" element={<PersonalInfoFormPage />} />
                     {/* Route for applying with a unique interview link */}
-                    <Route path="/api/application/apply/:uniqueId" element={<CandidateFlowPage />} />
+                    <Route path="/apply/:uniqueId" element={<CandidateFlowPage />} />
 
                 {/* Route for personal info form */}
                 <Route path="/personal-info" element={<PersonalInfoFormPage />} />
