@@ -31,21 +31,32 @@ export const useInterviewStore = create((set) => ({
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
             });
-            set((state) => ({
-                interviews: [...state.interviews, response.data],
-                loading: false,
-            }));
+
+            // Dönen veriyi kontrol etme
+            console.log('Eklenen mülakat:', response.data);
+
+            // Yeni mülakatı state'e ekleme
+            set((state) => {
+                console.log('Önceki state:', state.interviews);
+                const updatedInterviews = [...state.interviews, response.data];
+                console.log('Güncellenmiş state:', updatedInterviews);
+                return {
+                    interviews: updatedInterviews,
+                    loading: false,
+                };
+            });
         } catch (error) {
             console.error('Mülakat eklenirken hata oluştu:', error);
             set({ error: 'Mülakat eklenirken bir hata oluştu', loading: false });
         }
     },
 
+
     // Mülakat düzenleme fonksiyonu
     editInterview: async (updatedInterview) => {
         set({ loading: true });
         try {
-            const response = await axios.put(`http://localhost:5000/api/interview/update/${updatedInterview.id}`, updatedInterview, {
+            const response = await axios.put(`http://localhost:5000/api/interview/update/${updatedInterview._id}`, updatedInterview, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
@@ -83,19 +94,36 @@ export const useInterviewStore = create((set) => ({
         }
     },
 
-    // Mülakat silme fonksiyonu
     deleteInterview: async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/interview/delete/${id}`, {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Token bulunamadı, lütfen giriş yapın.');
+                return;
+            }
+
+            const response = await axios.delete(`http://localhost:5000/api/interview/delete/${id}`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${token}`,
                 },
             });
+
+            if (response.status === 200) {
+                console.log('Mülakat başarıyla silindi:', response.data);
+            } else {
+                console.error('Mülakat silme işlemi başarısız oldu:', response.data);
+            }
             set((state) => ({
                 interviews: state.interviews.filter((interview) => interview._id !== id),
             }));
         } catch (error) {
-            console.error('Mülakat silinirken hata oluştu:', error);
+            if (error.response) {
+                console.error('Sunucu hatası:', error.response.data.message || error.response.data);
+            } else if (error.request) {
+                console.error('Sunucuya bağlanılamadı veya yanıt alınamadı:', error.request);
+            } else {
+                console.error('İstek yapılandırmasında hata oluştu:', error.message);
+            }
         }
     },
     // Yalnızca yayınlanmış mülakatları fetch etme

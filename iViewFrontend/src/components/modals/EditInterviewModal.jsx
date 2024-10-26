@@ -3,63 +3,72 @@ import PropTypes from 'prop-types';
 import { useQuestionStore } from '../../stores/useQuestionStore';
 import { useInterviewStore } from '../../stores/useInterviewStore';
 
-function AddInterviewModal({ isOpen, onClose, onAdd }) {
+function EditInterviewModal({ isOpen, onClose, onSave, interview }) {
     const { questions, fetchQuestions, categories, fetchCategories } = useQuestionStore();
-    const { addInterview } = useInterviewStore();
-    const [interviewTitle, setInterviewTitle] = useState('');
-    const [selectedQuestions, setSelectedQuestions] = useState([]);
-    const [expireDate, setExpireDate] = useState('');
-    const [canSkip, setCanSkip] = useState(false);
-    const [showAtOnce, setShowAtOnce] = useState(false);
+    const { editInterview } = useInterviewStore();
+
+    const [interviewTitle, setInterviewTitle] = useState(interview?.title || '');
+    const [selectedQuestions, setSelectedQuestions] = useState(interview?.questions || []);
+    const [expireDate, setExpireDate] = useState(interview?.expirationDate || '');
+    const [canSkip, setCanSkip] = useState(interview?.canSkip || false);
+    const [showAtOnce, setShowAtOnce] = useState(interview?.showAtOnce || false);
     const [packageFilter, setPackageFilter] = useState('All');
 
     useEffect(() => {
         if (isOpen) {
             fetchQuestions();
             fetchCategories();
+            // Edit edilen interview bilgilerini state'e set ediyoruz
+            setInterviewTitle(interview?.title || '');
+            setSelectedQuestions(interview?.questions || []);
+            setExpireDate(interview?.expirationDate.split('T')[0] || '');
+            setCanSkip(interview?.canSkip || false);
+            setShowAtOnce(interview?.showAtOnce || false);
         }
-    }, [isOpen, fetchQuestions, fetchCategories]);
+    }, [isOpen, fetchQuestions, fetchCategories, interview]);
 
-    const handleAddInterview = () => {
-        if (!expireDate) {     // Tarih kontrolü
+    const handleSaveInterview = () => {
+        if (!expireDate) {
             alert('Please select an expiration date.');
             return;
         }
 
         const expireDateObj = new Date(expireDate);
         const today = new Date();
-        
-        if (isNaN(expireDateObj.getTime())) {     // Geçersiz tarih kontrolü
+
+        if (isNaN(expireDateObj.getTime())) {
             alert('Invalid date. Please select a valid expiration date.');
             return;
         }
-        if (expireDateObj <= today) {     // Tarihin gelecekte olduğundan emin ol
+
+        if (expireDateObj <= today) {
             alert('The expiration date must be in the future.');
             return;
         }
-        if (!canSkip && !showAtOnce) {     // Kullanıcı tercihi kontrolü
+
+        if (!canSkip && !showAtOnce) {
             alert('Either "Can Skip" or "Show At Once" must be selected.');
             return;
-        }   
+        }
 
-        const newInterview = { // Yeni mülakat verilerini oluşturma
+        const updatedInterview = {
+            ...interview,
             title: interviewTitle,
             questions: selectedQuestions,
             expirationDate: expireDateObj.toISOString(),
             canSkip,
             showAtOnce,
         };
-        console.log("Adding new interview:", newInterview);  // Yeni mülakatı ekleme
-    
+
         try {
-            onAdd(newInterview);
+            onSave(updatedInterview);
         } catch (error) {
-            console.error("Failed to add interview:", error);
-            alert("An error occurred while adding the interview. Please try again.");
+            console.error("Failed to save interview:", error);
+            alert("An error occurred while saving the interview. Please try again.");
             return;
         }
-        onClose(); // Modalı kapatma
-    };    
+        onClose();
+    };
 
     const handleSelectQuestion = (id) => {
         if (!selectedQuestions.includes(id)) {
@@ -68,7 +77,7 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
     };
 
     const handleDeselectQuestion = (id) => {
-        setSelectedQuestions(selectedQuestions.filter(qId => qId !== id));
+        setSelectedQuestions(selectedQuestions.filter((qId) => qId !== id));
     };
 
     const filteredQuestions = packageFilter === 'All'
@@ -80,7 +89,7 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-md shadow-lg w-1/3">
-                <h3 className="text-xl mb-4 text-indigo-700">Create Interview</h3>
+                <h3 className="text-xl mb-4 text-indigo-700">Edit Interview</h3>
                 <input
                     type="text"
                     placeholder="Interview Title"
@@ -123,7 +132,7 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
                             <h4 className="font-semibold text-indigo-700">Selected Questions</h4>
                             <ul className="h-40 overflow-y-auto">
                                 {selectedQuestions.map((id) => {
-                                    const question = questions.find(q => q._id === id);
+                                    const question = questions.find((q) => q._id === id);
                                     return question ? (
                                         <li key={id} className="cursor-pointer hover:bg-gray-200"
                                             onClick={() => handleDeselectQuestion(id)}>
@@ -166,9 +175,9 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
                 <div className="flex justify-end">
                     <button
                         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mr-2"
-                        onClick={handleAddInterview}
+                        onClick={handleSaveInterview}
                     >
-                        Add
+                        Save
                     </button>
                     <button
                         className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
@@ -182,10 +191,11 @@ function AddInterviewModal({ isOpen, onClose, onAdd }) {
     );
 }
 
-AddInterviewModal.propTypes = {
+EditInterviewModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    onAdd: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
+    interview: PropTypes.object,
 };
 
-export default AddInterviewModal;
+export default EditInterviewModal;
