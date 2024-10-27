@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import Webcam from 'react-webcam';
-import useVideoStore from '../stores/useVideoStore'; // Zustand store'unuzu import edin.
-import axios from 'axios';
+import { useVideoStore } from '../stores/useVideoStore'; // useVideoStore'u named import olarak içe aktarıyoruz
 
 const VideoRecorder = () => {
   const webcamRef = useRef(null);
@@ -46,34 +45,6 @@ const VideoRecorder = () => {
   const handleStopCaptureClick = () => {
     mediaRecorderRef.current.stop();
     setIsRecording(false);
-    // Kaydı tamamla ve ardından videoyu yükle
-    uploadVideo();
-  };
-  
-  const uploadVideo = async () => {
-    if (recordedChunks.length > 0) {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' }); // Yüklemek için video dosyasını blob olarak oluştur
-      const formData = new FormData();
-      
-      formData.append('video', blob, 'recordedVideo.mp4'); // Blob'u form data'ya ekle
-      formData.append('candidateId', '12345'); // Örnek olarak bir candidateId ekliyoruz (dinamik yapabilirsiniz)
-      formData.append('interviewId', 'interview_01'); // Örnek olarak bir interviewId ekliyoruz (dinamik yapabilirsiniz)
-  
-      try {
-        const response = await axios.post('/api/video/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        console.log('Video başarıyla yüklendi:', response.data.videoUrl);
-        // Burada video URL'sini state'e veya bir yere kaydedebilirsiniz, böylece videoyu izleyebilirsiniz.
-        resetChunks(); // Video yüklemesi tamamlandığında chunk'ları sıfırla
-      } catch (error) {
-        console.error('Video yüklenemedi:', error);
-      }
-    } else {
-      console.warn('Yüklenecek video yok');
-    }
   };
 
   return (
@@ -83,6 +54,7 @@ const VideoRecorder = () => {
           <Webcam
             audio={true}
             ref={webcamRef}
+            mirrored={true}
             videoConstraints={{
               width: 1920,
               height: 1080,
@@ -90,22 +62,6 @@ const VideoRecorder = () => {
             }}
             className="w-full h-full object-cover"
           />
-          
-          {isRecording ? (
-            <button 
-              onClick={handleStopCaptureClick} 
-              className="absolute bottom-4 left-4 bg-red-500 text-white py-2 px-4 rounded"
-            >
-              Stop Capture
-            </button>
-          ) : (
-            <button 
-              onClick={handleStartCaptureClick} 
-              className="absolute bottom-4 left-4 bg-blue-500 text-white py-2 px-4 rounded"
-            >
-              Start Capture
-            </button>
-          )}
         </div>
       )}
     </div>
