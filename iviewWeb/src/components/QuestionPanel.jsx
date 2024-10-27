@@ -1,38 +1,41 @@
 import React from 'react';
-import Timer from './Timer'; // Ensure the path is correct
+import Timer from './Timer';
 
-const QuestionPanel = ({ question, timeRemaining, onSkip, onDone }) => {
+const QuestionPanel = ({ question, timeRemaining, onSkip, onDone, questionIndex }) => {
     return (
         <div className="flex flex-col h-full justify-between">
+            {/* Soru Başlığı ve Detayları */}
             <div className="mb-4">
-                <p className="text-gray-700 text-lg leading-relaxed">
-                    {/* Display question text */}
-                    {question?.questionText || "No question available"}
-                </p>
-                <p className="text-sm text-gray-500">
+                <h3 className="text-lg font-semibold text-teal-900 mb-2">Soru {questionIndex + 1}: {question?.questionText || "No question available"}</h3> {/* Soru numarası dinamik olarak eklendi */}
+                {/* <h3 className="text-lg font-semibold text-teal-800"></h3> */}
+                {/* <p className="text-sm text-gray-500">
                     Duration: {question?.timeLimit || 0} minutes
+                </p> */}
+            </div>
+
+            {/* Bilgilendirme ve Uyarı Metinleri */}
+            <div className=" flex flex-col mt-4 mb-4">
+                <p className="text-red-600 text-sm leading-relaxed font-medium bg-red-100 p-1 rounded">
+                    Mülakat sırasında çıkış yaparsanız tekrar giremezsiniz.
                 </p>
-            </div>
+           
 
-            {/* Use Timer component to display the remaining time */}
-            <div className="my-4">
-                <Timer time={timeRemaining} label="Time Remaining" />
-            </div>
-
-            <div className="mt-4 flex justify-between">
+            {/* Geç ve Tamamla Butonları */}
+            <div className="flex justify-between mt-8">
                 <button
-                    className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                    className="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600"
                     onClick={onSkip}
                 >
                     Skip
                 </button>
                 <button
-                    className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                    className="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-900"
                     onClick={onDone}
                 >
                     Done
                 </button>
             </div>
+             </div>
         </div>
     );
 };
