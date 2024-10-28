@@ -7,7 +7,7 @@ const PersonalInfoFormPage = () => {
         name: '',
         surname: '',
         email: '',
-        phone: '',
+        phoneNumber: '',
         consent: false,
     });
 
@@ -143,7 +143,7 @@ const PersonalInfoFormPage = () => {
                     <label className="block mb-2">Phone*</label>
                     <input
                         type="text"
-                        name="phone"
+                        name="phoneNumber"
                         value={formData.phone}
                         onChange={handleChange}
                         className="border border-gray-300 p-2 rounded-md w-full mb-4"
