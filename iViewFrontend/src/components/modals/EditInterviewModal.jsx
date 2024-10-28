@@ -89,7 +89,7 @@ function EditInterviewModal({ isOpen, onClose, onSave, interview }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-md shadow-lg w-1/3">
-                <h3 className="text-xl mb-4 text-indigo-700">Edit Interview</h3>
+                <h3 className="text-xl mb-4 text-teal-700">Edit Interview</h3>
                 <input
                     type="text"
                     placeholder="Interview Title"
@@ -116,7 +116,7 @@ function EditInterviewModal({ isOpen, onClose, onSave, interview }) {
                     <div className="flex">
                         {/* Available Questions List */}
                         <div className="w-1/2 border border-gray-300 p-2 rounded-md mr-2">
-                            <h4 className="font-semibold text-indigo-700">Available Questions</h4>
+                            <h4 className="font-semibold text-teal-700">Available Questions</h4>
                             <ul className="h-40 overflow-y-auto">
                                 {filteredQuestions.map((question) => (
                                     <li key={question._id} className="cursor-pointer hover:bg-gray-200"
@@ -129,7 +129,7 @@ function EditInterviewModal({ isOpen, onClose, onSave, interview }) {
 
                         {/* Selected Questions List */}
                         <div className="w-1/2 border border-gray-300 p-2 rounded-md">
-                            <h4 className="font-semibold text-indigo-700">Selected Questions</h4>
+                            <h4 className="font-semibold text-teal-700">Selected Questions</h4>
                             <ul className="h-40 overflow-y-auto">
                                 {selectedQuestions.map((id) => {
                                     const question = questions.find((q) => q._id === id);
@@ -172,18 +172,18 @@ function EditInterviewModal({ isOpen, onClose, onSave, interview }) {
                     />
                 </div>
 
-                <div className="flex justify-end">
-                    <button
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mr-2"
-                        onClick={handleSaveInterview}
-                    >
-                        Save
-                    </button>
+                <div className="flex justify-between">
                     <button
                         className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
                         onClick={onClose}
                     >
                         Cancel
+                    </button>
+                     <button
+                        className="bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600 mr-2"
+                        onClick={handleSaveInterview}
+                    >
+                        Save
                     </button>
                 </div>
             </div>

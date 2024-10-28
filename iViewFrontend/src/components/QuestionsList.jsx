@@ -8,7 +8,7 @@ function QuestionList({ questions = [], onEdit, onDelete }) {
             {questions.length > 0 ? (
                 <table className="min-w-full table-auto">
                     <thead>
-                        <tr className="bg-indigo-600 text-white">
+                        <tr className="bg-teal-500 text-white">
                             <th className="p-4 text-left">Order</th>
                             <th className="p-4 text-left">Question</th>
                             <th className="p-4 text-left">Time (min)</th>

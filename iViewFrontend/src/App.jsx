@@ -54,8 +54,9 @@ function App() {
         <div className="min-h-screen flex">
           <Sidebar />
           <div className="flex flex-col w-full">
+            {/* Header için sola padding ekleyelim */}
             <Header onLogout={logout} />
-            <main className="p-4">
+            <main className="flex-grow p-4 mt-16"> {/* mt-16 ile Header yüksekliği kadar boşluk bırakıyoruz */}
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/manage-packages" element={<QuestionsManagePanel />} />

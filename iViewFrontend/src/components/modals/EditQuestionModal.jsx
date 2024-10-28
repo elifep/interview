@@ -32,7 +32,7 @@ function EditQuestionModal({ isOpen, onClose, question, onSave }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-md shadow-lg w-1/3">
-        <h3 className="text-xl mb-4 text-indigo-700">Edit Question</h3>
+        <h3 className="text-xl mb-4 text-teal-700">Edit Question</h3>
 
         <input
           type="text"
@@ -77,7 +77,7 @@ function EditQuestionModal({ isOpen, onClose, question, onSave }) {
             Cancel
           </button>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-700"
             onClick={handleSave}
           >
             Save

@@ -60,7 +60,7 @@ function InterviewManagePanel() {
 
     return (
         <div>
-            <h2 className="text-2xl font-semibold text-indigo-700 mb-6">Interview Manage Panel</h2>
+            <h2 className="text-2xl font-semibold text-teal-700 mb-6">Interview Manage Panel</h2>
 
             {/* Yüklenme veya hata mesajları */}
             {loading && <p>Loading interviews...</p>}
