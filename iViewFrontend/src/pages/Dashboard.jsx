@@ -19,7 +19,7 @@ function InterviewList() {
 
   return (
     <div className="w-full p-6 bg-white min-h-screen"> {/* Arka plan beyaz */}
-      <h2 className="text-2xl font-semibold mb-6 text-indigo-700">Active Interviews</h2> {/* Başlık */}
+      <h2 className="text-2xl font-semibold mb-6 text-teal-700">Active Interviews</h2> {/* Başlık */}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> {/* Grid yapı */}
         {interviews.map((interview) => (

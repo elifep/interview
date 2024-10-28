@@ -20,20 +20,20 @@ function InterviewCard({ interview }) {
     };
 
     return (
-        <div className="relative p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out">
+        <div className="relative p-6 bg-gray-50 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-indigo-700">{interview.title}</h3>
+                <h3 className="text-lg font-bold text-teal-700">{interview.title}</h3>
                 {interview.link && (
                     <button
                         onClick={handleCopyLink}
-                        className="text-gray-400 hover:text-indigo-600 transition-all duration-150"
+                        className="text-gray-400 hover:text-yellow-600 transition-all duration-150"
                     >
                         <i className="fas fa-link"></i> Copy Link
                     </button>
                 )}
             </div>
 
-            <div className="bg-indigo-50 p-4 rounded-md shadow-inner">
+            <div className="bg-teal-50 p-4 rounded-md shadow-inner">
                 <p className="text-sm font-medium text-gray-600 mb-2">Candidates: {interview.total || 0}</p>
             </div>
 
@@ -49,7 +49,7 @@ function InterviewCard({ interview }) {
                 </button> */}
                  <Link 
         to={`/videos/${interview._id}`} 
-        className="text-sm font-medium text-blue-500 hover:text-blue-700 transition-all duration-150"
+        className="text-sm font-medium text-yellow-500 hover:text-yellow-700 transition-all duration-150"
       >
         See Videos &gt;
       </Link>
