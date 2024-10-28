@@ -28,19 +28,6 @@ function Login() {
         }
     };
 
-    // const handleLogin = (e) => {
-    //     e.preventDefault();
-
-    //     // login fonksiyonu store'dan alınıyor ve email, password ile çağrılıyor
-    //     const success = login(email, password);
-
-    //     if (success) {
-    //         navigate('/'); // Giriş başarılıysa ana sayfaya yönlendir
-    //     } else {
-    //         setError('Invalid email or password.'); // Hatalıysa hata mesajı
-    //     }
-    // };
-
     return (
         <div className="flex items-center justify-center h-screen bg-blue-50">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">

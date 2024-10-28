@@ -6,7 +6,7 @@ function FilterDropdown({ filters, onFilter }) {
     return (
         <div className="relative">
             <button
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md"
+                className="bg-teal-500 text-white px-4 py-2 rounded-md"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 Filter

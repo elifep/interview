@@ -61,7 +61,7 @@ function QuestionsManagePanel() {
 
     return (
         <div>
-            <h2 className="text-2xl font-semibold text-indigo-700 mb-6">Questions Manage Panel</h2>
+            <h2 className="text-2xl font-semibold text-teal-700 mb-6">Questions Manage Panel</h2>
 
             {loading && <p>Loading questions...</p>}
             {error && <p className="text-red-600">Error: {error}</p>}
