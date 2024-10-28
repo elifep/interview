@@ -1,19 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import Webcam from 'react-webcam';
-import { useVideoStore } from '../stores/useVideoStore'; // useVideoStore'u named import olarak içe aktarıyoruz
+import { useVideoStore } from '../stores/useVideoStore';
 
-const VideoRecorder = () => {
+const VideoRecorder = ({ onStartRecording, onStopRecording }) => {
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
 
   const {
     hasPermission,
     setHasPermission,
-    isRecording,
     setIsRecording,
-    recordedChunks,
     setRecordedChunks,
-    resetChunks,
   } = useVideoStore();
 
   useEffect(() => {
@@ -28,24 +25,45 @@ const VideoRecorder = () => {
   }, [setHasPermission]);
 
   const handleStartCaptureClick = () => {
+    if (!webcamRef.current) {
+      console.error('Webcam reference is not set');
+      return;
+    }
+
     setIsRecording(true);
     mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
       mimeType: 'video/webm'
     });
+    
     mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable);
     mediaRecorderRef.current.start();
+    console.log('Recording started...');
   };
 
   const handleDataAvailable = ({ data }) => {
     if (data.size > 0) {
-      setRecordedChunks((prev) => [...prev, data]); // Ensure `recordedChunks` is an array
+      console.log('Data available:', data);
+      setRecordedChunks((prev) => [...prev, data]);
+    } else {
+      console.warn('No data available in recording chunk');
+    }
+  };  
+
+  const handleStopCaptureClick = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      console.log('Recording stopped.');
+      setIsRecording(false);
+    } else {
+      console.error('No media recorder found.');
     }
   };
 
-  const handleStopCaptureClick = () => {
-    mediaRecorderRef.current.stop();
-    setIsRecording(false);
-  };
+  // Expose functions to parent component through props
+  useEffect(() => {
+    if (onStartRecording) onStartRecording(handleStartCaptureClick);
+    if (onStopRecording) onStopRecording(handleStopCaptureClick);
+  }, [onStartRecording, onStopRecording]);
 
   return (
     <div className="flex justify-center items-center w-full h-full bg-gray-900">
