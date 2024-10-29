@@ -53,8 +53,8 @@ const InterviewFlowPage = ({ interview }) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    };
-
+    }; 
+//
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-teal-50">
             <div className="w-full max-w-7xl mx-auto px-8 pt-4"> {/* w-full ve max genişlik ile sınırladık */}
