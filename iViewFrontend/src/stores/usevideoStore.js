@@ -2,53 +2,41 @@ import { create } from 'zustand';
 import axios from 'axios';
 
 export const useVideoStore = create((set) => ({
-  videos: [],
+  videos: [], // Videoları saklayacak dizi
   fetchVideos: async (interviewId) => {
     try {
       const response = await axios.get(`/api/interview/${interviewId}/applications`);
+      
+      // Gelen veri bir array ise işleme al
       if (Array.isArray(response.data)) {
-        // Set only applications with a video URL
-        set({ videos: response.data.filter(app => app.videoUrl) });
+        const videoApplications = response.data.filter(app => app.videoUrl); // Sadece video URL'si olanları filtrele
+        
+        // Her video URL için presigned URL oluşturma isteği yapabiliriz
+        const videoPromises = videoApplications.map(async (app) => {
+          try {
+            const videoResponse = await axios.get(`/api/video/${app.videoUrl}/presigned-url`);
+            return {
+              ...app,
+              presignedUrl: videoResponse.data.presignedUrl // Presigned URL'yi alıp objeye ekliyoruz
+            };
+          } catch (videoError) {
+            console.error(`Video URL alınamadı: ${app.videoUrl}`, videoError);
+            return null; // Hata olursa null dön
+          }
+        });
+
+        // Tüm videoları bekliyoruz
+        const videos = await Promise.all(videoPromises);
+
+        // Hatalı olanlar null olacağı için filtreliyoruz
+        set({ videos: videos.filter(video => video !== null) });
       } else {
-        console.error("Expected an array:", response.data);
+        console.error("Veri bir dizi değil:", response.data);
         set({ videos: [] });
       }
     } catch (error) {
-      console.error("Error fetching videos:", error);
+      console.error("Başvurular getirilirken hata oluştu:", error);
+      set({ videos: [] });
     }
   },
 }));
-
-// import { create } from 'zustand';
-
-// export const useVideoStore = create((set) => ({
-//     // videos: [
-//     //     { id: 1, candidate: 'Abdulkadir Kattaş', status: 'Approved', videoUrl: '/videos/1.mp4', packageId: 1 },
-//     //     { id: 2, candidate: 'Yıldız Azizi', status: 'Pending', videoUrl: '/videos/2.mp4', packageId: 1 },
-//     //     { id: 3, candidate: 'Ahat Demirezen', status: 'Approved', videoUrl: '/videos/3.mp4', packageId: 2 },
-//     //     { id: 4, candidate: 'Murat Efe Çetin', status: 'Pending', videoUrl: '/videos/4.mp4', packageId: 2 },
-//     //     { id: 5, candidate: 'Taha Zeytun', status: 'Approved', videoUrl: '/videos/5.mp4', packageId: 3 },
-//     //     { id: 6, candidate: 'Seda Müritsoy', status: 'Pending', videoUrl: '/videos/6.mp4', packageId: 3 },
-//     //     { id: 7, candidate: 'Seda Müritsoy', status: 'Pending', videoUrl: '/videos/7.mp4', packageId: 3 },
-//     //     { id: 8, candidate: 'Elif Ep', status: 'Pending', videoUrl: '/videos/8.mp4', packageId: 8 },
-//     // ],
-
-//     fetchVideos: async () => {
-//         // API call to fetch videos (if necessary)
-//             try {
-//               const response = await axios.get(`/api/video/interview/${interviewId}`);
-//               console.log("Gelen Videolar:", response.data); // Konsolda veriyi kontrol edin
-//               if (Array.isArray(response.data)) { // Gelen verinin dizi olduğunu kontrol edin
-//                 setVideos(response.data);
-//               } else {
-//                 console.error("Beklenen dizi alınamadı:", response.data);
-//                 setVideos([]); // Hatalı durumda boş bir diziye set edebilirsiniz
-//               }
-//             } catch (err) {
-//               setError('Videolar yüklenirken bir hata oluştu');
-//               setVideos([]); // Hatalı durumda boş bir diziye set edebilirsiniz
-//               setLoading(false);
-//             }
-   
-//     },
-// }));

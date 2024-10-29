@@ -7,7 +7,7 @@ const PersonalInfoFormPage = () => {
         name: '',
         surname: '',
         email: '',
-        phoneNumber: '',
+        phoneNumber: '', // phone yerine phoneNumber olarak değiştirdim
         consent: false,
     });
 
@@ -65,13 +65,13 @@ const PersonalInfoFormPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!hasPermission) {
-            alert("Please enable camera and microphone access to continue.");
+            alert("Lütfen kamera ve mikrofon erişimini etkinleştirin.");
             return;
         }
         if (formData.consent) {
             submitPersonalInfo(formData);
         } else {
-            alert('Please agree to the KVKK text.');
+            alert('KVKK metnini kabul etmelisiniz.');
         }
     };
 
@@ -140,11 +140,11 @@ const PersonalInfoFormPage = () => {
                         required
                     />
 
-                    <label className="block mb-2">Phone*</label>
+                    <label className="block mb-2">Phone Number*</label> {/* phone -> phoneNumber */}
                     <input
                         type="text"
-                        name="phoneNumber"
-                        value={formData.phone}
+                        name="phoneNumber" // phone yerine phoneNumber olmalı
+                        value={formData.phoneNumber} // phone yerine phoneNumber olmalı
                         onChange={handleChange}
                         className="border border-gray-300 p-2 rounded-md w-full mb-4"
                         required

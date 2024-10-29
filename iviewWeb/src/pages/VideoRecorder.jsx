@@ -1,62 +1,55 @@
-import React, { useRef, useEffect } from 'react';
-import Webcam from 'react-webcam';
+
+import React, { useEffect, useRef } from 'react';
 import { useVideoStore } from '../stores/useVideoStore';
 
-const VideoRecorder = ({ onStartRecording, onStopRecording }) => {
-  const webcamRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-
+const VideoRecorder = ({ interviewId, candidateId }) => {
+  const videoRef = useRef(null);
   const {
-    hasPermission,
-    setHasPermission,
+    isRecording,
     setIsRecording,
     setRecordedChunks,
+    uploadToS3,
+    resetChunks,
   } = useVideoStore();
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        setHasPermission(true);
-      })
-      .catch(error => {
-        setHasPermission(false);
-        console.error('Camera and microphone permission denied:', error);
-      });
-  }, [setHasPermission]);
+    const getVideoStream = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoRef.current.srcObject = stream;
+        setIsRecording(false);
+      } catch (error) {
+        console.error('Kamera erişimi reddedildi', error);
+      }
+    };
+    getVideoStream();
+  }, [setIsRecording]);
 
-  const handleStartCaptureClick = () => {
-    if (!webcamRef.current) {
-      console.error('Webcam reference is not set');
-      return;
-    }
-
-    setIsRecording(true);
-    mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-      mimeType: 'video/webm'
-    });
-    
-    mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable);
-    mediaRecorderRef.current.start();
-    console.log('Recording started...');
-  };
-
-  const handleDataAvailable = ({ data }) => {
-    if (data.size > 0) {
-      console.log('Data available:', data);
-      setRecordedChunks((prev) => [...prev, data]);
+  const handleRecording = () => {
+    if (isRecording) {
+      const stream = videoRef.current.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      setIsRecording(false);
     } else {
-      console.warn('No data available in recording chunk');
+      const mediaRecorder = new MediaRecorder(videoRef.current.srcObject);
+      let chunks = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        setRecordedChunks(chunks);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
     }
   };  
 
-  const handleStopCaptureClick = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      console.log('Recording stopped.');
-      setIsRecording(false);
-    } else {
-      console.error('No media recorder found.');
-    }
+  const handleUpload = () => {
+    uploadToS3(interviewId, candidateId);
   };
 
   // Expose functions to parent component through props
@@ -66,22 +59,15 @@ const VideoRecorder = ({ onStartRecording, onStopRecording }) => {
   }, [onStartRecording, onStopRecording]);
 
   return (
-    <div className="flex justify-center items-center w-full h-full bg-gray-900">
-      {hasPermission && (
-        <div className="relative w-full h-full">
-          <Webcam
-            audio={true}
-            ref={webcamRef}
-            mirrored={true}
-            videoConstraints={{
-              width: 1920,
-              height: 1080,
-              facingMode: "user"
-            }}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+    <div>
+      <video ref={videoRef} autoPlay muted></video>
+      <button onClick={handleRecording}>
+        {isRecording ? 'Kaydı Durdur' : 'Kaydı Başlat'}
+      </button>
+      <button onClick={handleUpload} disabled={recordedChunks.length === 0}>
+        Videoyu Yükle
+      </button>
+      <button onClick={resetChunks}>Chunk'ları Sıfırla</button>
     </div>
   );
 };

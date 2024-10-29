@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { create } from 'zustand';
+import { useVideoStore } from './useVideoStore'; // Video store'u içe aktarıyoruz
 
 export const useInterviewStore = create((set, get) => ({
   interview: null,
@@ -10,7 +11,7 @@ export const useInterviewStore = create((set, get) => ({
   currentQuestionIndex: 0,
   timeRemaining: 0,
   totalTimeRemaining: 0,
-  countdownStarted: false, // New state to track if countdown has started
+  countdownStarted: false,
 
   setTimeRemaining: (time) => set({ timeRemaining: time }),
   setTotalTimeRemaining: (time) => set({ totalTimeRemaining: time }),
@@ -52,7 +53,7 @@ export const useInterviewStore = create((set, get) => ({
       const interval = setInterval(() => {
         get().decrementTime();
       }, 1000);
-      set({ countdownInterval: interval }); // Save the interval ID to clear it later if needed
+      set({ countdownInterval: interval });
     }
   },
   
@@ -106,19 +107,45 @@ export const useInterviewStore = create((set, get) => ({
     }
   },
 
-  // Kişisel bilgileri gönderme fonksiyonu
-  // submitPersonalInfo: async (formData) => {
-  //   set({ personalInfoSubmitted: true });
-  // },
-
-  // Soruyu tamamlama fonksiyonu
-  completeQuestion: () => {
-    console.log("Question completed.");
-  },
-
-  // Soruyu geçme fonksiyonu
-  skipQuestion: () => {
-    get().nextQuestion();
+  // Form verilerini backend'e gönderme fonksiyonu
+  submitPersonalInfo: async (formData) => {
+    const { interview } = get(); 
+    const { setApplicationId } = useVideoStore.getState(); // `setApplicationId` fonksiyonunu alıyoruz
+  
+    if (!interview?._id) {
+      console.error('Mülakat ID bulunamadı');
+      set({ error: 'Interview ID is missing' });
+      return;
+    }
+  
+    try {
+      set({ isLoading: true });
+  
+      const dataToSend = {
+        ...formData,
+        interviewId: interview._id, // Interview ID ekleniyor
+      };
+  
+      const response = await axios.post('http://localhost:5000/api/application/appadd', dataToSend, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      const applicationId = response.data.applicationId; // `applicationId`'yi backend'den alıyoruz
+      
+      if (applicationId) {
+        setApplicationId(applicationId); // `applicationId`'yi `useVideoStore`'a kaydediyoruz
+      }
+  
+      set({ personalInfoSubmitted: true });
+      console.log('Başvuru başarıyla oluşturuldu:', response.data);
+    } catch (error) {
+      console.error('Başvuru oluşturulamadı:', error);
+      set({ error: 'Başvuru oluşturulamadı', isLoading: false });
+    } finally {
+      set({ isLoading: false });
+    }
   },
   // Form verilerini backend'e gönderme fonksiyonu
 submitPersonalInfo: async (formData) => {
