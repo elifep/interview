@@ -65,12 +65,18 @@ const VideoRecorder = ({ interviewId, candidateId }) => {
       setRecording(false);
       console.log('Kayıt durduruldu.');
     }
-  };
+  };  
 
   // Video S3'e yükleme işlemi
   const handleUpload = async () => {
     await uploadToS3(interviewId, candidateId); // ID bilgileri ile S3'e video yüklüyoruz
   };
+
+  // Expose functions to parent component through props
+  useEffect(() => {
+    if (onStartRecording) onStartRecording(handleStartCaptureClick);
+    if (onStopRecording) onStopRecording(handleStopCaptureClick);
+  }, [onStartRecording, onStopRecording]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-900">

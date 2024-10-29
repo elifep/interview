@@ -23,6 +23,7 @@ export const useVideoStore = create((set, get) => ({
   // Kayıt chunk'larını sıfırlama
   resetChunks: () => set({ recordedChunks: [] }),
 
+
   uploadToS3: async () => {
     const { recordedChunks, applicationId } = get(); // Başvuru ID'yi store'dan alıyoruz
   
@@ -37,7 +38,7 @@ export const useVideoStore = create((set, get) => ({
       console.warn('Yüklenecek video yok');
       return;
     }
-  
+
     // Blob oluştur
     const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
     const formData = new FormData();
