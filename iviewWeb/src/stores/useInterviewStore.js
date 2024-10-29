@@ -7,7 +7,7 @@ export const useInterviewStore = create((set, get) => ({
   questions: [],
   isLoading: false,
   error: null,
-  personalInfoSubmitted: false, 
+  personalInfoSubmitted: false,
   currentQuestionIndex: 0,
   timeRemaining: 0,
   totalTimeRemaining: 0,
@@ -56,7 +56,7 @@ export const useInterviewStore = create((set, get) => ({
       set({ countdownInterval: interval });
     }
   },
-  
+
   nextQuestion: () => {
     const currentQuestionIndex = get().currentQuestionIndex;
     const interview = get().interview;
@@ -76,7 +76,7 @@ export const useInterviewStore = create((set, get) => ({
   fetchInterview: async (uniqueId) => {
     set({ isLoading: true, error: null });
     try {
-      const initialResponse = await axios.get(`http://localhost:5000/api/application/apply/${uniqueId}`);
+      const initialResponse = await axios.get('http://localhost:5000/api/application/apply/${uniqueId}');
       const interviewDetails = initialResponse.data;
       const interviewId = interviewDetails?._id;
 
@@ -84,7 +84,7 @@ export const useInterviewStore = create((set, get) => ({
         throw new Error('Interview ID not found in response');
       }
 
-      const questionsResponse = await axios.get(`http://localhost:5000/api/interview/start/${interviewId}`);
+      const questionsResponse = await axios.get('http://localhost:5000/api/interview/start/${interviewId}');
       const questions = questionsResponse.data.questions || questionsResponse.data;
 
       if (!Array.isArray(questions) || questions.length === 0) {
@@ -109,35 +109,35 @@ export const useInterviewStore = create((set, get) => ({
 
   // Form verilerini backend'e gönderme fonksiyonu
   submitPersonalInfo: async (formData) => {
-    const { interview } = get(); 
-    const { setApplicationId } = useVideoStore.getState(); // `setApplicationId` fonksiyonunu alıyoruz
-  
+    const { interview } = get();
+    const { setApplicationId } = useVideoStore.getState(); // setApplicationId fonksiyonunu alıyoruz
+
     if (!interview?._id) {
       console.error('Mülakat ID bulunamadı');
       set({ error: 'Interview ID is missing' });
       return;
     }
-  
+
     try {
       set({ isLoading: true });
-  
+
       const dataToSend = {
         ...formData,
         interviewId: interview._id, // Interview ID ekleniyor
       };
-  
+
       const response = await axios.post('http://localhost:5000/api/application/appadd', dataToSend, {
         headers: {
           'Content-Type': 'application/json',
         }
       });
-      
-      const applicationId = response.data.applicationId; // `applicationId`'yi backend'den alıyoruz
-      
+
+      const applicationId = response.data.applicationId; // applicationId'yi backend'den alıyoruz
+
       if (applicationId) {
-        setApplicationId(applicationId); // `applicationId`'yi `useVideoStore`'a kaydediyoruz
+        setApplicationId(applicationId); // applicationId'yi useVideoStore'a kaydediyoruz
       }
-  
+
       set({ personalInfoSubmitted: true });
       console.log('Başvuru başarıyla oluşturuldu:', response.data);
     } catch (error) {
@@ -147,37 +147,4 @@ export const useInterviewStore = create((set, get) => ({
       set({ isLoading: false });
     }
   },
-  // Form verilerini backend'e gönderme fonksiyonu
-submitPersonalInfo: async (formData) => {
-  const { interview } = get(); // Mülakat bilgisini store'dan al
-
-  if (!interview?._id) {
-    console.error('Mülakat ID bulunamadı');
-    set({ error: 'Interview ID is missing' });
-    return;
-  }
-
-  try {
-    set({ isLoading: true });
-
-    // interviewId'yi formData'ya ekleyin
-    const dataToSend = {
-      ...formData,
-      interviewId: interview._id, // Mülakat ID'sini ekliyoruz
-    };
-
-    const response = await axios.post('http://localhost:5000/api/application/appadd', JSON.stringify(dataToSend), {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-    set({ personalInfoSubmitted: true });
-    console.log('Başvuru başarıyla oluşturuldu:', response.data);
-  } catch (error) {
-    console.error('Başvuru oluşturulamadı:', error);
-    set({ error: 'Başvuru oluşturulamadı', isLoading: false });
-  } finally {
-    set({ isLoading: false });
-  }
-},
 }));

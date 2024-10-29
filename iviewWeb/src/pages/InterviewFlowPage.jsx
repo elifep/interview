@@ -67,7 +67,6 @@ const InterviewFlowPage = ({ interview }) => {
                 <ProgressBar progress={(currentQuestionIndex / interview.questions.length) * 100} />
             </div>
 
-
             <div className="flex flex-grow w-full max-w-7xl mx-auto bg-teal shadow-lg rounded-lg mt-2 mb-2 p-2 ">
                 <div className="flex-1 bg-black relative">
                     <VideoPlayer onStartRecording={startRecording} />
