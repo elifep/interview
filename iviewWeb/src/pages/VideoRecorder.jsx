@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { useVideoStore } from '../stores/useVideoStore';
 
@@ -6,7 +7,6 @@ const VideoRecorder = ({ interviewId, candidateId }) => {
   const {
     isRecording,
     setIsRecording,
-    recordedChunks,
     setRecordedChunks,
     uploadToS3,
     resetChunks,
@@ -46,11 +46,17 @@ const VideoRecorder = ({ interviewId, candidateId }) => {
       mediaRecorder.start();
       setIsRecording(true);
     }
-  };
+  };  
 
   const handleUpload = () => {
     uploadToS3(interviewId, candidateId);
   };
+
+  // Expose functions to parent component through props
+  useEffect(() => {
+    if (onStartRecording) onStartRecording(handleStartCaptureClick);
+    if (onStopRecording) onStopRecording(handleStopCaptureClick);
+  }, [onStartRecording, onStopRecording]);
 
   return (
     <div>
