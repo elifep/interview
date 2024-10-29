@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PersonalInfoFormPage from './pages/PersonalInfoFormPage';
 import InterviewFlowPage from './pages/InterviewFlowPage';
 import CandidateFlowPage from './pages/CandidateFlowPage'; // Assuming this is your interview page
+import SuccessPage from './pages/SuccessPage'; // Assuming this is your interview page
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
 
                 {/* Route for the candidate interview flow after the personal info form */}
                 <Route path="/interview" element={<InterviewFlowPage />} />
+                <Route path="/success-page" element={<SuccessPage />} />   
 
             
             </Routes>
