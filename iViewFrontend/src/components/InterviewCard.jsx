@@ -1,13 +1,27 @@
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function InterviewCard({ interview }) {
-    const navigate = useNavigate();
+    const [applicationCount, setApplicationCount] = useState(0); // Başvuru sayısını tutmak için state
 
-    // const handleSeeVideos = (interviewId) => {
-    //     navigate(`/videos/${interviewId}`); // Videoları görme
-    // };
+    // Mülakatın başvuru sayısını çekme işlevi
+    useEffect(() => {
+        const fetchApplicationCount = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/api/application/interview/${interview._id}/count`);
+                
+                // `applicationCount` verisini API'den alıyoruz
+                setApplicationCount(response.data.applicationCount); // Doğru veri yolunu kullanarak sayıyı set ediyoruz
+            } catch (error) {
+                console.error("Başvuru sayısı alınamadı:", error);
+            }
+        };
+
+        fetchApplicationCount();
+    }, [interview._id]);
 
     // Mülakatın linkini kopyalama işlevi
     const handleCopyLink = () => {
@@ -34,25 +48,19 @@ function InterviewCard({ interview }) {
             </div>
 
             <div className="bg-teal-50 p-4 rounded-md shadow-inner">
-                <p className="text-sm font-medium text-gray-600 mb-2">Candidates: {interview.total || 0}</p>
+                <p className="text-sm font-medium text-gray-600 mb-2">Candidates: {applicationCount}</p> {/* Doğru sayıyı göster */}
             </div>
 
             <div className="flex justify-between items-center mt-4">
                 <p className={`text-sm font-medium ${interview.published ? 'text-green-500' : 'text-red-500'}`}>
                     {interview.published ? 'Published' : 'Not Published'}
                 </p>
-                {/* <button
-                    className="text-sm font-medium text-blue-500 hover:text-blue-700 transition-all duration-150"
-                    onClick={() => handleSeeVideos(interview._id)} // Burada _id kullanıyoruz
+                <Link 
+                    to={`/videos/${interview._id}`} 
+                    className="text-sm font-medium text-yellow-500 hover:text-yellow-700 transition-all duration-150"
                 >
-                    See Videos &gt;
-                </button> */}
-                 <Link 
-        to={`/videos/${interview._id}`} 
-        className="text-sm font-medium text-yellow-500 hover:text-yellow-700 transition-all duration-150"
-      >
-        See Videos &gt;
-      </Link>
+                    See Applications &gt;
+                </Link>
             </div>
         </div>
     );
@@ -62,10 +70,9 @@ function InterviewCard({ interview }) {
 InterviewCard.propTypes = {
     interview: PropTypes.shape({
         title: PropTypes.string.isRequired,
-        total: PropTypes.number,
         published: PropTypes.bool.isRequired,
-        _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired, // _id kullanıyoruz
-        link: PropTypes.string, // Link isteğe bağlı, çünkü yayında olmayan mülakatların linki olmayacak
+        _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        link: PropTypes.string,
     }).isRequired,
 };
 

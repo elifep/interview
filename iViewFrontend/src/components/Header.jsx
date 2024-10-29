@@ -33,8 +33,8 @@ function Header({ onLogout }) {
             }`}
         >
             <div className="flex items-center space-x-4">
+            <div className="text-xl font-bold text-teal-800"> Admin Page</div>
                 <img src={Logo} alt="Logo" className="w-32 h-auto" /> {/* Logoyu ekliyoruz */}
-                <div className="text-xl font-bold text-teal-800">Remote-tech Admin Page</div>
             </div>
             <div className="flex items-center space-x-4">
                 <BellAlertIcon className="h-6 w-6 text-gray-600 hover:text-gray-800 cursor-pointer" />
