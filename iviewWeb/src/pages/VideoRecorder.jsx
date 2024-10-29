@@ -1,69 +1,67 @@
-import React, { useRef, useEffect } from 'react';
-import Webcam from 'react-webcam';
-import { useVideoStore } from '../stores/useVideoStore'; // useVideoStore'u named import olarak içe aktarıyoruz
+import React, { useEffect, useRef } from 'react';
+import { useVideoStore } from '../stores/useVideoStore';
 
-const VideoRecorder = () => {
-  const webcamRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-
+const VideoRecorder = ({ interviewId, candidateId }) => {
+  const videoRef = useRef(null);
   const {
-    hasPermission,
-    setHasPermission,
     isRecording,
     setIsRecording,
     recordedChunks,
     setRecordedChunks,
+    uploadToS3,
     resetChunks,
   } = useVideoStore();
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        setHasPermission(true);
-      })
-      .catch(error => {
-        setHasPermission(false);
-        console.error('Camera and microphone permission denied:', error);
-      });
-  }, [setHasPermission]);
+    const getVideoStream = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoRef.current.srcObject = stream;
+        setIsRecording(false);
+      } catch (error) {
+        console.error('Kamera erişimi reddedildi', error);
+      }
+    };
+    getVideoStream();
+  }, [setIsRecording]);
 
-  const handleStartCaptureClick = () => {
-    setIsRecording(true);
-    mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-      mimeType: 'video/webm'
-    });
-    mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable);
-    mediaRecorderRef.current.start();
-  };
+  const handleRecording = () => {
+    if (isRecording) {
+      const stream = videoRef.current.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      setIsRecording(false);
+    } else {
+      const mediaRecorder = new MediaRecorder(videoRef.current.srcObject);
+      let chunks = [];
 
-  const handleDataAvailable = ({ data }) => {
-    if (data.size > 0) {
-      setRecordedChunks((prev) => [...prev, data]); // Ensure `recordedChunks` is an array
+      mediaRecorder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        setRecordedChunks(chunks);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
     }
   };
 
-  const handleStopCaptureClick = () => {
-    mediaRecorderRef.current.stop();
-    setIsRecording(false);
+  const handleUpload = () => {
+    uploadToS3(interviewId, candidateId);
   };
 
   return (
-    <div className="flex justify-center items-center w-full h-full bg-gray-900">
-      {hasPermission && (
-        <div className="relative w-full h-full">
-          <Webcam
-            audio={true}
-            ref={webcamRef}
-            mirrored={true}
-            videoConstraints={{
-              width: 1920,
-              height: 1080,
-              facingMode: "user"
-            }}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+    <div>
+      <video ref={videoRef} autoPlay muted></video>
+      <button onClick={handleRecording}>
+        {isRecording ? 'Kaydı Durdur' : 'Kaydı Başlat'}
+      </button>
+      <button onClick={handleUpload} disabled={recordedChunks.length === 0}>
+        Videoyu Yükle
+      </button>
+      <button onClick={resetChunks}>Chunk'ları Sıfırla</button>
     </div>
   );
 };
