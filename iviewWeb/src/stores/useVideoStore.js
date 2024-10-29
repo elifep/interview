@@ -33,7 +33,7 @@ export const useVideoStore = create((set, get) => ({
       console.error('Başvuru ID eksik, video yüklenemiyor.');
       return;
     }
-  
+  //
     if (recordedChunks.length === 0) {
       console.warn('Yüklenecek video yok');
       return;

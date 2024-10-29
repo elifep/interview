@@ -1,55 +1,75 @@
-
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Webcam from 'react-webcam';
 import { useVideoStore } from '../stores/useVideoStore';
 
 const VideoRecorder = ({ interviewId, candidateId }) => {
-  const videoRef = useRef(null);
+  const webcamRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const [recording, setRecording] = useState(false);
+
   const {
-    isRecording,
-    setIsRecording,
+    hasPermission,
+    setHasPermission,
+    recordedChunks,
     setRecordedChunks,
     uploadToS3,
     resetChunks,
   } = useVideoStore();
 
+  // Kamera ve mikrofon izni kontrolü
   useEffect(() => {
-    const getVideoStream = async () => {
+    const checkPermissions = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        videoRef.current.srcObject = stream;
-        setIsRecording(false);
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (stream) setHasPermission(true);
       } catch (error) {
-        console.error('Kamera erişimi reddedildi', error);
+        setHasPermission(false);
+        console.error('Kamera ve mikrofon erişim izni reddedildi:', error);
       }
     };
-    getVideoStream();
-  }, [setIsRecording]);
+    checkPermissions();
+  }, [setHasPermission]);
 
-  const handleRecording = () => {
-    if (isRecording) {
-      const stream = videoRef.current.srcObject;
-      const tracks = stream.getTracks();
-      tracks.forEach(track => track.stop());
-      setIsRecording(false);
-    } else {
-      const mediaRecorder = new MediaRecorder(videoRef.current.srcObject);
-      let chunks = [];
+  // Kayıt başlatma işlemi
+  const handleStartRecording = () => {
+    if (!webcamRef.current || !webcamRef.current.stream) {
+      console.error('Kamera akışı bulunamadı');
+      return;
+    }
 
-      mediaRecorder.ondataavailable = (event) => {
+    setRecording(true);
+    mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
+      mimeType: 'video/webm'
+    });
+
+    let chunks = [];
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) {
         chunks.push(event.data);
-      };
+      }
+    };
 
-      mediaRecorder.onstop = () => {
-        setRecordedChunks(chunks);
-      };
+    mediaRecorderRef.current.onstop = () => {
+      setRecordedChunks(chunks); // Kayıt chunk'larını store'a ekliyoruz
+      console.log('Kayıt durduruldu, chunk\'lar kaydedildi.');
+    };
 
-      mediaRecorder.start();
-      setIsRecording(true);
+    mediaRecorderRef.current.start();
+    console.log('Kayıt başladı...');
+  };
+
+  // Kayıt durdurma işlemi
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+      console.log('Kayıt durduruldu.');
     }
   };  
 
-  const handleUpload = () => {
-    uploadToS3(interviewId, candidateId);
+  // Video S3'e yükleme işlemi
+  const handleUpload = async () => {
+    await uploadToS3(interviewId, candidateId); // ID bilgileri ile S3'e video yüklüyoruz
   };
 
   // Expose functions to parent component through props
@@ -59,15 +79,43 @@ const VideoRecorder = ({ interviewId, candidateId }) => {
   }, [onStartRecording, onStopRecording]);
 
   return (
-    <div>
-      <video ref={videoRef} autoPlay muted></video>
-      <button onClick={handleRecording}>
-        {isRecording ? 'Kaydı Durdur' : 'Kaydı Başlat'}
-      </button>
-      <button onClick={handleUpload} disabled={recordedChunks.length === 0}>
-        Videoyu Yükle
-      </button>
-      <button onClick={resetChunks}>Chunk'ları Sıfırla</button>
+    <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-900">
+      {hasPermission ? (
+        <>
+          <Webcam
+            audio={true}
+            ref={webcamRef}
+            mirrored={true}
+            videoConstraints={{
+              width: 1920,
+              height: 1080,
+              facingMode: 'user',
+            }}
+            className="w-full h-full object-cover"
+          />
+
+          <div className="absolute bottom-8 flex space-x-4">
+            <button
+              onClick={recording ? handleStopRecording : handleStartRecording}
+              className="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-700"
+            >
+              {recording ? 'Kaydı Durdur' : 'Kaydı Başlat'}
+            </button>
+            <button
+              onClick={handleUpload}
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+              disabled={recordedChunks.length === 0}
+            >
+              Videoyu Yükle
+            </button>
+            <button onClick={resetChunks} className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700">
+              Chunk'ları Sıfırla
+            </button>
+          </div>
+        </>
+      ) : (
+        <p className="text-white">Lütfen kamera ve mikrofona izin verin.</p>
+      )}
     </div>
   );
 };
