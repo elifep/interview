@@ -10,10 +10,10 @@ export const useVideoStore = create((set, get) => ({
 
   // Kamera izni kontrolü
   setHasPermission: (permission) => set({ hasPermission: permission }),
-  
+
   // Kayıt durumu
   setIsRecording: (isRecording) => set({ isRecording }),
-  
+
   // Kaydedilen video chunk'larını güncelleme
   setRecordedChunks: (chunks) => set({ recordedChunks: chunks }),
 
@@ -23,17 +23,16 @@ export const useVideoStore = create((set, get) => ({
   // Kayıt chunk'larını sıfırlama
   resetChunks: () => set({ recordedChunks: [] }),
 
-
   uploadToS3: async () => {
     const { recordedChunks, applicationId } = get(); // Başvuru ID'yi store'dan alıyoruz
-  
+
     console.log('Alındı', applicationId); // Başvuru ID'yi burada logluyoruz
-  
+
     if (!applicationId) {
       console.error('Başvuru ID eksik, video yüklenemiyor.');
       return;
     }
-  //
+    //
     if (recordedChunks.length === 0) {
       console.warn('Yüklenecek video yok');
       return;
@@ -44,7 +43,7 @@ export const useVideoStore = create((set, get) => ({
     const formData = new FormData();
     formData.append('video', videoBlob, 'interview_video.webm'); // Video dosyasını formData'ya ekliyoruz
     formData.append('applicationId', applicationId); // Başvuru ID'sini ekliyoruz
-  
+
     try {
       // S3'e yükleme için API çağrısı
       const response = await axios.post('http://localhost:5000/api/video/upload', formData, {
@@ -52,9 +51,9 @@ export const useVideoStore = create((set, get) => ({
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       console.log('Video başarıyla yüklendi:', response.data);
-  
+
       // Yükleme sonrası chunk'ları sıfırlıyoruz
       set({ recordedChunks: [] });
     } catch (error) {
