@@ -3,106 +3,71 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const VideoCollection = () => {
-  const { interviewId } = useParams(); // Get interviewId from URL parameters
-  const [videos, setVideos] = useState([]);
+  const { interviewId } = useParams(); // URL'den interviewId'yi al
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchVideos = async () => {
+    const fetchApplications = async () => {
       try {
-        const response = await axios.get(`/api/interview/${interviewId}/applications`);
-        console.log("Fetched Applications:", response.data); // Check applications in console
+        const response = await axios.get(`http://localhost:5000/api/application/interview/${interviewId}/applications`);
+        console.log("Fetched Applications:", response.data); // Başvuruları kontrol et
+    
         if (Array.isArray(response.data)) {
-          setVideos(response.data.filter((app) => app.videoUrl)); // Filter applications with videoUrl
+          // Gelen başvuruları state'e kaydet
+          setApplications(response.data);
         } else {
-          console.error("Expected an array:", response.data);
-          setVideos([]); // Set to empty array in case of error
+          console.error("Array bekleniyor fakat farklı bir veri alındı:", response.data);
+          setApplications([]); // Hata durumunda boş array set et
         }
         setLoading(false);
       } catch (err) {
-        setError('Error fetching videos');
-        setVideos([]);
+        setError('Başvurular çekilirken bir hata oluştu');
+        setApplications([]);
         setLoading(false);
       }
     };
-    fetchVideos();
+    
+    fetchApplications();
   }, [interviewId]);
 
-  if (loading) return <p>Loading videos...</p>;
+  if (loading) return <p>Başvurular yükleniyor...</p>;
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="video-collection-page">
-      <h2>Uploaded Videos</h2>
-      <div className="video-grid">
-        {videos.map((video) => (
-          <div key={video._id} className="video-card">
-            <h3>Candidate: {video.name} {video.surname}</h3>
-            <video controls width="300">
-              <source src={`/${video.videoUrl}`} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        ))}
-      </div>
+    <div className="application-collection-page">
+      <h2 className="text-2xl font-bold mb-4">Başvurular</h2>
+      {applications.length === 0 ? (
+        <p>Henüz başvuru bulunmuyor.</p>
+      ) : (
+        <div className="application-list">
+          {applications.map((application) => (
+            <div key={application._id} className="application-card p-4 bg-gray-100 shadow-md rounded-lg mb-4">
+              <h3 className="text-lg font-semibold mb-2">
+                Aday: {application.name} {application.surname}
+              </h3>
+              <p className="text-sm text-gray-600">Email: {application.email}</p>
+              <p className="text-sm text-gray-600">Telefon: {application.phoneNumber}</p>
+              <p className="text-sm text-gray-600">Durum: <strong>{application.status}</strong></p>
+              <p className="text-sm text-gray-600">Başvuru Tarihi: {new Date(application.appliedAt).toLocaleDateString()}</p>
+
+              {application.presignedUrl ? (
+                <div className="mt-4">
+                  <video controls className="w-full h-auto">
+                    <source src={`${application.presignedUrl}`} type="video/mp4" />
+                    Tarayıcınız bu video formatını desteklemiyor.
+                  </video>
+                </div>
+              ) : (
+                <p className="text-red-500 mt-2">Video bulunamadı.</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 export default VideoCollection;
-
-// import React, { useEffect, useState } from 'react';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-
-// const VideoCollection = () => {
-//   const { interviewId } = useParams(); // Get interviewId from URL parameters
-//   const [videos, setVideos] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchVideos = async () => {
-//       try {
-//         const response = await axios.get(`/api/video/interview/${interviewId}`);
-//         console.log("Gelen Videolar:", response.data); // Konsolda veriyi kontrol edin
-//         if (Array.isArray(response.data)) { // Gelen verinin dizi olduğunu kontrol edin
-//           setVideos(response.data);
-//         } else {
-//           console.error("Beklenen dizi alınamadı:", response.data);
-//           setVideos([]); // Hatalı durumda boş bir diziye set edebilirsiniz
-//         }
-//       } catch (err) {
-//         setError('Videolar yüklenirken bir hata oluştu');
-//         setVideos([]); // Hatalı durumda boş bir diziye set edebilirsiniz
-//         setLoading(false);
-//       }
-//     };
-  
-//     fetchVideos();
-//   }, [interviewId]);
-  
-
-//   if (loading) return <p>Loading videos...</p>;
-//   if (error) return <p>{error}</p>;
-
-//   return (
-//     <div className="video-collection-page">
-//       <h2>Uploaded Videos</h2>
-//       <div className="video-grid">
-//         {videos.map((video) => (
-//           <div key={video._id} className="video-card">
-//             <h3>Candidate ID: {video.candidateId}</h3>
-//             <video controls width="300">
-//               <source src={`/${video.videoUrl}`} type="video/mp4" />
-//               Your browser does not support the video tag.
-//             </video>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default VideoCollection;
