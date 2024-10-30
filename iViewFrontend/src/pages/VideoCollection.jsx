@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import VideoPlayer from '../components/VideoPlayer'; // VideoPlayer bileşeni
+import { toast } from 'react-toastify'; // Toastify import ediyoruz
+import 'react-toastify/dist/ReactToastify.css'; // Toastify CSS'i import ediyoruz
 
 const VideoCollection = () => {
   const { interviewId } = useParams(); // URL'den interviewId'yi al
@@ -51,7 +53,7 @@ const VideoCollection = () => {
         status,
         adminNote,
       });
-      alert(`Başvuru ${status === 'Onaylandı' ? 'onaylandı' : 'reddedildi'}.`);
+      toast.success(`Başvuru ${status === 'Onaylandı' ? 'onaylandı' : 'reddedildi'}.`); // Başarı mesajı
 
       // Başvurunun durumu güncellendikten sonra başvuruları tekrar çekiyoruz
       setApplications(prev =>
@@ -60,8 +62,8 @@ const VideoCollection = () => {
         )
       );
     } catch (error) {
+      toast.error(`Başvuru ${status === 'Onaylandı' ? 'onaylanırken' : 'reddedilirken'} bir hata oluştu.`); // Hata mesajı
       console.error(`Başvuru ${status === 'Onaylandı' ? 'onaylanırken' : 'reddedilirken'} hata oluştu:`, error);
-      alert(`Başvuru ${status === 'Onaylandı' ? 'onaylanırken' : 'reddedilirken'} bir hata oluştu.`);
     }
   };
 
@@ -109,9 +111,23 @@ const VideoCollection = () => {
               <p className="text-sm text-gray-600">Durum: <strong>{application.status}</strong></p>
               <p className="text-sm text-gray-600">Başvuru Tarihi: {new Date(application.appliedAt).toLocaleDateString()}</p>
 
+              {/* AI Skorunu gösteren Progress Bar */}
+              {application.aiScore !== undefined && (
+                <div className="mt-4">
+                  <label className="text-sm font-medium text-gray-600">AI Skoru:</label>
+                  <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
+                    <div
+                      className="bg-teal-500 h-4 rounded-full"
+                      style={{ width: `${application.aiScore}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm font-medium text-gray-700 mt-1">{application.aiScore}%</p>
+                </div>
+              )}
+
               {/* Admin Notu Girişi */}
               <div className="mt-4">
-                <label htmlFor={`adminNote-${application._id}`} className="text-sm text-gray-600 font-medium">Admin Notu:</label>
+                <label htmlFor={`adminNote-${application._id}`} className="text-sm text-gray-600 font-medium">IK Note:</label>
                 <textarea
                   id={`adminNote-${application._id}`}
                   value={adminNotes[application._id] || application.adminNote || ''}

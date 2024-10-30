@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify'; // Toastify import edildi
 
 function InterviewCard({ interview }) {
     const [applicationCount, setApplicationCount] = useState(0); // Başvuru sayısını tutmak için state
@@ -16,6 +17,7 @@ function InterviewCard({ interview }) {
                 // `applicationCount` verisini API'den alıyoruz
                 setApplicationCount(response.data.applicationCount); // Doğru veri yolunu kullanarak sayıyı set ediyoruz
             } catch (error) {
+                toast.error("Başvuru sayısı alınamadı!"); // Başvuru sayısı alınamadığında hata mesajı gösteriliyor
                 console.error("Başvuru sayısı alınamadı:", error);
             }
         };
@@ -27,9 +29,9 @@ function InterviewCard({ interview }) {
     const handleCopyLink = () => {
         if (interview.link) {
             navigator.clipboard.writeText(interview.link); // Tarayıcıda panoya kopyalama işlemi
-            alert('Başvuru linki kopyalandı!');
+            toast.success('Başvuru linki kopyalandı!'); // Link kopyalandığında başarı mesajı
         } else {
-            alert('Mülakat yayında değil.');
+            toast.warn('Mülakat yayında değil.'); // Mülakat yayında değilse uyarı mesajı
         }
     };
 
@@ -48,7 +50,7 @@ function InterviewCard({ interview }) {
             </div>
 
             <div className="bg-teal-50 p-4 rounded-md shadow-inner">
-                <p className="text-sm font-medium text-gray-600 mb-2">Candidates: {applicationCount}</p> {/* Doğru sayıyı göster */}
+                <p className="text-sm font-medium text-gray-600 mb-2">Candidates: {applicationCount}</p> {/* Doğru sayıyı göster */} 
             </div>
 
             <div className="flex justify-between items-center mt-4">
