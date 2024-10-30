@@ -1,34 +1,32 @@
-import { useState, useEffect } from 'react'; // useEffect kancasını ekliyoruz
+import { useState, useEffect } from 'react';
 import QuestionsList from '../components/QuestionsList';
 import FilterDropdown from '../components/FilterDropdown';
 import AddButton from '../components/buttons/AddButton';
-import AddQuestionsModal from '../components/modals/AddQuestionsModal'; // Modal'ı import ediyoruz.
-import EditQuestionModal from '../components/modals/EditQuestionModal'; // Düzenleme modali
-import { useQuestionStore } from '../stores/useQuestionStore'; // Store'dan veri çekmek için import ediyoruz.
+import AddQuestionsModal from '../components/modals/AddQuestionsModal';
+import EditQuestionModal from '../components/modals/EditQuestionModal';
+import { useQuestionStore } from '../stores/useQuestionStore';
+import { toast } from 'react-toastify'; // Toastify'ı import ediyoruz
 
 function QuestionsManagePanel() {
-    const { questions, fetchQuestions, addQuestion, deleteQuestion, editQuestion, loading, error, categories, fetchCategories } = useQuestionStore(); // Soru güncelleme fonksiyonunu da ekledik
+    const { questions, fetchQuestions, addQuestion, deleteQuestion, editQuestion, loading, error, categories, fetchCategories } = useQuestionStore();
     const [filteredQuestions, setFilteredQuestions] = useState([]);
     const [filter, setFilter] = useState('All');
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
 
-    // Sayfa yüklendiğinde soruları ve kategorileri backend'den çek
     useEffect(() => {
         fetchQuestions();
         fetchCategories();
     }, [fetchQuestions, fetchCategories]);
 
     useEffect(() => {
-        // Sorular veya filtre değiştikçe filtrelenmiş soruları günceller
         if (filter === 'All') {
-          setFilteredQuestions(questions);
+            setFilteredQuestions(questions);
         } else {
-          setFilteredQuestions(questions.filter((q) => q.topic === filter));
+            setFilteredQuestions(questions.filter((q) => q.topic === filter));
         }
-      }, [questions, filter]);
-      
+    }, [questions, filter]);
 
     // Filtreleme işlemi
     const handleFilter = (selectedFilter) => {
@@ -37,13 +35,23 @@ function QuestionsManagePanel() {
 
     // Soru ekleme işlemi
     const handleAddQuestion = (newQuestion) => {
-        addQuestion(newQuestion);
-        setAddModalOpen(false);
+        try {
+            addQuestion(newQuestion);
+            setAddModalOpen(false);
+            toast.success('Soru başarıyla eklendi!'); // Başarı mesajı
+        } catch (error) {
+            toast.error('Soru eklenirken bir hata oluştu.'); // Hata mesajı
+        }
     };
 
     // Soru silme işlemi
     const handleDelete = (id) => {
-        deleteQuestion(id);
+        try {
+            deleteQuestion(id);
+            toast.success('Soru başarıyla silindi!'); // Başarı mesajı
+        } catch (error) {
+            toast.error('Soru silinirken bir hata oluştu.'); // Hata mesajı
+        }
     };
 
     // Soru düzenleme işlemi
@@ -54,9 +62,14 @@ function QuestionsManagePanel() {
 
     // Soru kaydetme işlemi (düzenleme sonrası)
     const handleSaveEdit = (updatedQuestion) => {
-        editQuestion(updatedQuestion);
-        setEditModalOpen(false);
-        setSelectedQuestion(null);
+        try {
+            editQuestion(updatedQuestion);
+            setEditModalOpen(false);
+            setSelectedQuestion(null);
+            toast.success('Soru başarıyla güncellendi!'); // Başarı mesajı
+        } catch (error) {
+            toast.error('Soru güncellenirken bir hata oluştu.'); // Hata mesajı
+        }
     };
 
     return (

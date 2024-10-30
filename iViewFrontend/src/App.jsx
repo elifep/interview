@@ -11,6 +11,10 @@ import VideoCollection from './pages/VideoCollection';
 import InterviewManagePanel from './pages/InterviewManagePanel'; 
 import QuestionsManagePanel from './pages/QuestionsManagePanel';
 
+// Toastify importları
+import { ToastContainer, toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css'; // Toastify'ın CSS dosyası
+
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated); 
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus); 
@@ -21,14 +25,14 @@ function App() {
 
   useEffect(() => {
     checkAuthStatus();
-//
+
     let logoutTimer;
 
     // Kullanıcı hareketsizse oturumu kapat
     const resetLogoutTimer = () => {
       if (logoutTimer) clearTimeout(logoutTimer);
       logoutTimer = setTimeout(() => {
-        alert("Oturumunuz zaman aşımına uğradı, lütfen tekrar giriş yapın.");
+        toast.info("Oturumunuz zaman aşımına uğradı, lütfen tekrar giriş yapın."); // Zaman aşımı için toast bildirimi
         logout(); // Otomatik çıkış
       }, SESSION_TIMEOUT);
     };
@@ -74,6 +78,19 @@ function App() {
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       )}
+
+      {/* ToastContainer bileşeni, tüm uygulamada toast bildirimlerinin çalışması için */}
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false} 
+        newestOnTop={false} 
+        closeOnClick 
+        rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover 
+      />
     </BrowserRouter>
   );
 }
