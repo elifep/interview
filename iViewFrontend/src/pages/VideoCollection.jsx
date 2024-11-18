@@ -5,6 +5,8 @@ import VideoPlayer from '../components/VideoPlayer'; // VideoPlayer bileşeni
 import { toast } from 'react-toastify'; // Toastify import ediyoruz
 import 'react-toastify/dist/ReactToastify.css'; // Toastify CSS'i import ediyoruz
 
+const BASE_URL = import.meta.env.VITE_APP_BACKEND_URL;
+
 const VideoCollection = () => {
   const { interviewId } = useParams(); // URL'den interviewId'yi al
   const [applications, setApplications] = useState([]); // Başvuruları saklayan state
@@ -17,7 +19,7 @@ const VideoCollection = () => {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/application/interview/${interviewId}/applications`);
+        const response = await axios.get(`${BASE_URL}/api/application/interview/${interviewId}/applications`);
         console.log("Fetched Applications:", response.data); // Başvuruları kontrol et
     
         if (Array.isArray(response.data)) {
@@ -49,7 +51,7 @@ const VideoCollection = () => {
   const handleUpdateStatus = async (applicationId, status) => {
     try {
       const adminNote = adminNotes[applicationId] || ''; // Admin notu alınıyor, eğer yoksa boş string
-      await axios.put(`http://localhost:5000/api/application/${applicationId}/update-status`, {
+      await axios.put(`${BASE_URL}/api/application/${applicationId}/update-status`, {
         status,
         adminNote,
       });

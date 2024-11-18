@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify'; // Toastify import edildi
 
+const BASE_URL = import.meta.env.VITE_APP_BACKEND_URL;
+
 function InterviewCard({ interview }) {
     const [applicationCount, setApplicationCount] = useState(0); // Başvuru sayısını tutmak için state
 
@@ -12,7 +14,7 @@ function InterviewCard({ interview }) {
     useEffect(() => {
         const fetchApplicationCount = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/application/interview/${interview._id}/count`);
+                const response = await axios.get(`${BASE_URL}/api/application/interview/${interview._id}/count`);
                 
                 // `applicationCount` verisini API'den alıyoruz
                 setApplicationCount(response.data.applicationCount); // Doğru veri yolunu kullanarak sayıyı set ediyoruz
