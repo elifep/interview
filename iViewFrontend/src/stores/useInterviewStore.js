@@ -12,7 +12,7 @@ export const useInterviewStore = create((set) => ({
     fetchInterviews: async () => {
         set({ loading: true });
         try {
-            const response = await axios.get(`${BASE_URL}api/interview/list`, {
+            const response = await axios.get(`${BASE_URL}/api/interview/list`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
