@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
+const BASE_URL = import.meta.env.VITE_APP_BACKEND_URL;
 
 export const useAuthStore = create((set) => ({
     isAuthenticated: false, // Giriş durumu
@@ -18,7 +19,7 @@ export const useAuthStore = create((set) => ({
     // Giriş yapma işlevi
     login: async (username, password) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/admin/login', {
+            const response = await axios.post(`${BASE_URL}/api/admin/login`, {
                 username,
                 password,
             });
@@ -54,7 +55,7 @@ export const useAuthStore = create((set) => ({
     logout: async () => {
         try {
             console.log('Logout işlemi tetiklendi'); // Logout fonksiyonunun çalıştığını doğrulamak için
-            await axios.post('http://localhost:5000/api/admin/logout');
+            await axios.post(`${BASE_URL}/api/admin/logout`);
 
             set({ isAuthenticated: false, user: null, token: null });
             localStorage.removeItem('token'); // Token'ı localStorage'dan silme

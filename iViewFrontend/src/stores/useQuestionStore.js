@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios'; // API çağrıları için axios'u ekliyoruz
 
-// Helper function: Axios isteklerine token ekler
+const BASE_URL = import.meta.env.VITE_APP_BACKEND_URL;// Helper function: Axios isteklerine token ekler
 const getAuthHeader = () => {
   const token = localStorage.getItem('token'); // localStorage'dan token alıyoruz
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -20,7 +20,7 @@ export const useQuestionStore = create((set) => ({
         throw new Error('Token bulunamadı, lütfen tekrar giriş yapın.');
       }
 
-      const response = await axios.get('http://localhost:5000/api/question/list', {
+      const response = await axios.get(`${BASE_URL}/api/question/list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -35,7 +35,7 @@ export const useQuestionStore = create((set) => ({
   // Backend'den kategorileri çekme fonksiyonu
   fetchCategories: async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/category/categories', {
+      const response = await axios.get(`${BASE_URL}/api/category/categories`, {
         headers: getAuthHeader(), // Token doğrulaması için headers ekliyoruz
       });
 
@@ -51,7 +51,7 @@ export const useQuestionStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/category/categories',
+        `${BASE_URL}/api/category/categories`,
         {
           name: newCategory,
         },
@@ -74,7 +74,7 @@ export const useQuestionStore = create((set) => ({
   addQuestion: async (newQuestion) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.post('http://localhost:5000/api/question/add', {
+      const response = await axios.post(`${BASE_URL}/api/question/add`, {
         questionText: newQuestion.question,
         timeLimit: newQuestion.time,
         topic: newQuestion.category,
@@ -97,7 +97,7 @@ export const useQuestionStore = create((set) => ({
   deleteQuestion: async (id) => {
     set({ loading: true, error: null });
     try {
-      await axios.delete(`http://localhost:5000/api/question/delete/${id}`, {
+      await axios.delete(`${BASE_URL}/api/question/delete/${id}`, {
         headers: getAuthHeader() // Token doğrulaması için headers ekliyoruz
       });
       set((state) => ({
@@ -115,7 +115,7 @@ export const useQuestionStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/question/update/${updatedQuestion._id}`,
+        `${BASE_URL}/api/question/update/${updatedQuestion._id}`,
         {
           questionText: updatedQuestion.questionText,
           timeLimit: updatedQuestion.timeLimit,

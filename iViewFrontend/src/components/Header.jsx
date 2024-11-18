@@ -32,9 +32,9 @@ function Header({ onLogout }) {
                 isVisible ? 'translate-y-0' : '-translate-y-full'
             }`}
         >
-            <div className="flex items-center space-x-4">
-            <div className="text-xl font-bold text-teal-800"> Admin Page</div>
+            <div className="flex items-center justify-between space-x-24">
                 <img src={Logo} alt="Logo" className="w-32 h-auto" /> {/* Logoyu ekliyoruz */}
+                <div className="text-xl font-bold text-teal-800"> Admin Page</div>
             </div>
             <div className="flex items-center space-x-4">
                 <BellAlertIcon className="h-6 w-6 text-gray-600 hover:text-gray-800 cursor-pointer" />

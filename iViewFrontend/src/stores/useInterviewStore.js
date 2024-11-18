@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_APP_BACKEND_URL;
+
 export const useInterviewStore = create((set) => ({
     interviews: [],
     loading: false,
@@ -10,7 +12,7 @@ export const useInterviewStore = create((set) => ({
     fetchInterviews: async () => {
         set({ loading: true });
         try {
-            const response = await axios.get('http://localhost:5000/api/interview/list', {
+            const response = await axios.get(`${BASE_URL}api/interview/list`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
@@ -26,7 +28,7 @@ export const useInterviewStore = create((set) => ({
     addInterview: async (newInterview) => {
         set({ loading: true });
         try {
-            const response = await axios.post('http://localhost:5000/api/interview/create', newInterview, {
+            const response = await axios.post(`${BASE_URL}/api/interview/create`, newInterview, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
@@ -56,7 +58,7 @@ export const useInterviewStore = create((set) => ({
     editInterview: async (updatedInterview) => {
         set({ loading: true });
         try {
-            const response = await axios.put(`http://localhost:5000/api/interview/update/${updatedInterview._id}`, updatedInterview, {
+            const response = await axios.put(`${BASE_URL}/api/interview/update/${updatedInterview._id}`, updatedInterview, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
@@ -77,7 +79,7 @@ export const useInterviewStore = create((set) => ({
     togglePublished: async (id, currentPublishedStatus) => {
         try {
             const updatedStatus = !currentPublishedStatus;
-            const response = await axios.put(`http://localhost:5000/api/interview/publish/${id}`, {
+            const response = await axios.put(`${BASE_URL}/api/interview/publish/${id}`, {
                 published: updatedStatus,
             }, {
                 headers: {
@@ -102,7 +104,7 @@ export const useInterviewStore = create((set) => ({
                 return;
             }
 
-            const response = await axios.delete(`http://localhost:5000/api/interview/delete/${id}`, {
+            const response = await axios.delete(`${BASE_URL}/api/interview/delete/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -138,7 +140,7 @@ export const useInterviewStore = create((set) => ({
         }
 
         try {
-            const response = await axios.get('http://localhost:5000/api/interview/published', {
+            const response = await axios.get(`${BASE_URL}/api/interview/published`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
