@@ -145,13 +145,13 @@ export const useInterviewStore = create((set) => ({
                     Authorization: `Bearer ${token}`,
                 },
             });
-
             // Gelen yanıtın geçerli olup olmadığını kontrol edin
             if (response.status === 200 && Array.isArray(response.data)) {
                 set({ interviews: response.data, loading: false });
             } else {
                 throw new Error('Geçersiz yanıt alındı');
             }
+            //burada bazen error
         } catch (error) {
             console.error('Yayınlanmış mülakatlar alınırken hata oluştu:', error);
 
