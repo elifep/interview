@@ -1,8 +1,5 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# İnterview - Admin Page
+Admin paneli
+-interviewleri görüntüleme adayı onaylama reddetme not bırakma seçenekleri
+-soru oluşturma, silme, süresi-konusu-soru
+-interview oluşturma ve publish - unpublish etme, sorulardan categoriye göre ya da hepsini görerek soru ekleme interviewe isim belirleyip yeni interview oluşturma, silme
