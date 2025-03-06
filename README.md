@@ -10,3 +10,5 @@ Admin paneli
 -soru oluşturma, silme, süresi-konusu-soru.
 
 -interview oluşturma ve publish - unpublish etme, sorulardan categoriye göre ya da hepsini görerek soru ekleme interviewe isim belirleyip yeni interview oluşturma, silme.
+## Login Page
+![Login Sayfası](https://github.com/elifep/interview/issues/29#issue-2900403258)
